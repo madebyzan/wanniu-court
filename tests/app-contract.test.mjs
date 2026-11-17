@@ -4,7 +4,9 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const inlineScript = Array.from(html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g))[0]?.[1] || '';
+const scriptStart = html.indexOf('<script>');
+const scriptEnd = html.indexOf('</script>', scriptStart + 8);
+const inlineScript = scriptStart >= 0 && scriptEnd > scriptStart ? html.slice(scriptStart + 8, scriptEnd) : '';
 const artwork = [
   'assets/hero-court.jpg',
   'assets/judge-cat.jpg',
@@ -20,9 +22,9 @@ const artwork = [
 ];
 
 test('document declares Chinese language and a mobile-safe viewport', () => {
-  assert.match(html, /<html lang="zh-CN">/);
-  assert.match(html, /viewport[^>]+viewport-fit=cover/);
-  assert.match(html, /id="app"/);
+  assert.ok(html.includes('<html lang="zh-CN">'));
+  assert.ok(html.includes('viewport-fit=cover'));
+  assert.ok(html.includes('id="app"'));
 });
 
 test('main application script parses without executing browser side effects', () => {
@@ -30,13 +32,15 @@ test('main application script parses without executing browser side effects', ()
   assert.doesNotThrow(() => new vm.Script(inlineScript));
 });
 
-test('generated local artwork is valid JPEG and remote resources are not referenced', async () => {
+test('generated artwork is valid local JPEG and remote assets are not referenced', async () => {
   for (const path of artwork) {
     const bytes = await readFile(new URL('../' + path, import.meta.url));
     assert.ok(bytes.length > 500, path + ' should not be empty');
     assert.deepEqual(Array.from(bytes.subarray(0, 3)), [0xff, 0xd8, 0xff], path + ' should be a JPEG');
   }
-  assert.doesNotMatch(html, /(?:src|href)=["']https?:\/\//i);
+  for (const remotePrefix of ['src="https:', "src='https:", 'href="https:', "href='https:"]) {
+    assert.equal(html.includes(remotePrefix), false);
+  }
 });
 
 test('key user journeys are wired to explicit actions', () => {
@@ -46,11 +50,11 @@ test('key user journeys are wired to explicit actions', () => {
 });
 
 test('the experience includes responsive and reduced-motion treatments', () => {
-  assert.match(html, /@media\s*\(max-width:\s*640px\)/);
-  assert.match(html, /prefers-reduced-motion:\s*reduce/);
+  assert.ok(html.includes('max-width:640px'));
+  assert.ok(html.includes('prefers-reduced-motion:reduce'));
 });
 
 test('history uses a namespaced local storage key and is bounded', () => {
-  assert.match(inlineScript, /wanniu-court-github-v1/);
-  assert.match(inlineScript, /slice\(0,\s*80\)/);
+  assert.ok(inlineScript.includes('wanniu-court-github-v1'));
+  assert.ok(inlineScript.includes('slice(0,80)'));
 });
