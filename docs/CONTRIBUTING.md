@@ -17,11 +17,19 @@ npm run dev
 ## 质量检查
 
 ```bash
-npm run check
-npm test
+npm run check    # 52 张素材存在且接入界面
+npm test         # 19 项产品与视觉契约
 ```
 
-提交前必须保证两个命令通过。测试会检查内联脚本语法、移动端 viewport、远程资源约束、关键交互入口和本地历史边界。
+提交前必须保证两条命令通过。契约测试覆盖内联脚本语法、移动端 viewport、远程资源约束、关键交互入口、本地历史边界，并且会**主动拦截**两类历史翻车：把场景/物件图 `background-size: 100% 100%` 铺成 UI 表面，以及把 `page-corners.png` 整张拉伸。
+
+端到端与视觉复核（需要 Playwright，见 [tools/README.md](../tools/README.md)）：
+
+```bash
+node tools/verify.mjs   # 46 项端到端断言，失败即非零退出
+node tools/tour.mjs     # 全界面整页截图
+node tools/poster.mjs   # 导出 1080x1440 海报原图
+```
 
 ## 代码约束
 
@@ -35,4 +43,10 @@ npm test
 
 ## 视觉约束
 
-参见 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)。新插画要服务具体场景，不用 AI 生成图里的文字冒充真实 UI。
+参见 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)。要点：
+
+- 新插画要服务具体场景，不用 AI 生成图里的文字冒充真实 UI
+- 界面文字、按钮、卡片、印章、分隔线一律由 HTML/CSS/SVG 渲染，保证任意 DPI 清晰
+- 素材按类型只能用对应的一种用法：场景 `cover`、立绘 `contain`、证书纸九宫格 `border-image`、角花四角平铺、丝带标签等比
+- 需要新的切片数值时，先逐行扫描源图确认空白带，再按 `切片 × (盒宽 / 源宽)` 推边框宽度，不要凭感觉填像素
+- 破坏性操作用应用内确认弹层，不用 `window.confirm`

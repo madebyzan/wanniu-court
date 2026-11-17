@@ -4,6 +4,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
     const propAssets = {folder:'./assets/props/case-folder.png',column:'./assets/props/court-column.png',crown:'./assets/props/crown.png',envelope:'./assets/props/evidence-envelope.png',gavel:'./assets/props/gavel.png',hourglass:'./assets/props/hourglass.png',laurel:'./assets/props/laurel-wreath.png',magnifier:'./assets/props/magnifier.png',watch:'./assets/props/pocket-watch.png',quill:'./assets/props/quill.png',candlestick:'./assets/props/royal-candlestick.png',key:'./assets/props/royal-key.png',scroll:'./assets/props/royal-scroll.png',seal:'./assets/props/royal-seal.png',shield:'./assets/props/royal-shield.png',scales:'./assets/props/scales.png'};
     const categoryAssets = {work:'./assets/defendants/meeting.png',life:'./assets/defendants/alarm.png',social:'./assets/characters/cat-lawyer.png',digital:'./assets/defendants/algorithm.png',self:'./assets/defendants/procrastination.png',campus:'./assets/defendants/early.png'};
     const defendantAssets = {monday:'./assets/defendants/monday.png',meeting:'./assets/defendants/meeting.png',simple:'./assets/defendants/simple-change.png',boss:'./assets/defendants/boss.png',alarm:'./assets/defendants/alarm.png',delivery:'./assets/defendants/delivery.png',rain:'./assets/defendants/rain.png',read:'./assets/defendants/read.png',next:'./assets/defendants/next.png',autoplay:'./assets/defendants/autoplay.png',renew:'./assets/defendants/renew.png',algorithm:'./assets/defendants/algorithm.png',procrastination:'./assets/defendants/procrastination.png',overthink:'./assets/defendants/overthink.png',early:'./assets/defendants/early.png',group:'./assets/defendants/group.png'};
+    const decor={primary:'./assets/decor/btn-primary.png',secondary:'./assets/decor/btn-secondary.png',cardFrame:'./assets/decor/case-card-frame.png',categoryLabel:'./assets/decor/category-label.png',deliberation:'./assets/decor/deliberation-banner.png',divider:'./assets/decor/divider-ornament.png',corners:'./assets/decor/page-corners.png',section:'./assets/decor/section-banner.png'};
     const courtProps = [{name:'案件卷宗',desc:'收录指控与判决的正式卷册',image:propAssets.folder},{name:'正义科林斯柱',desc:'审判庭的庄严立柱',image:propAssets.column},{name:'王室冠冕',desc:'法庭荣誉与身份象征',image:propAssets.crown},{name:'证据档案信封',desc:'封存来往证词与材料',image:propAssets.envelope},{name:'法槌与底座',desc:'开庭与宣判的信号',image:propAssets.gavel},{name:'王冠沙漏',desc:'合议庭的计时器',image:propAssets.hourglass},{name:'月桂正义徽章',desc:'胜诉与荣誉的装饰徽记',image:propAssets.laurel},{name:'正义放大镜',desc:'检查细枝末节的证据',image:propAssets.magnifier},{name:'珐琅怀表',desc:'记录案件发生的时间',image:propAssets.watch},{name:'羽毛笔与墨水',desc:'书写正式诉状与判词',image:propAssets.quill},{name:'巴洛克双烛台',desc:'档案室与审判厅照明',image:propAssets.candlestick},{name:'王室钥匙徽章',desc:'通往卷宗室的象征',image:propAssets.key},{name:'法徽卷轴',desc:'公示法庭公告与规章',image:propAssets.scroll},{name:'红蜡正义印章',desc:'封缄档案与判决副本',image:propAssets.seal},{name:'正义盾牌',desc:'法庭徽记与装饰盾牌',image:propAssets.shield},{name:'天平徽章',desc:'衡量事实与指控',image:propAssets.scales}];
     const courtCharacters = [{name:'白鸽阁下',role:'首席审判官',image:characterAssets.judge},{name:'猫律师',role:'原告代理律师',image:characterAssets.cat},{name:'青蛙小记',role:'法庭书记员',image:characterAssets.frog},{name:'仓鼠档案员',role:'卷宗管理员',image:characterAssets.hamster},{name:'刺猬执法官',role:'法庭秩序官',image:characterAssets.hedgehog},{name:'兔子证人',role:'案件证人',image:characterAssets.rabbit}];
     const courtScenes = [{name:'主审判庭',desc:'开庭与首席法官审理',image:sceneAssets.hero},{name:'案件大厅',desc:'浏览案件并进入立案',image:sceneAssets.hall},{name:'立案受理处',desc:'接收用户提交的起诉',image:sceneAssets.filing},{name:'秘密合议室',desc:'法官与书记员讨论裁决',image:sceneAssets.deliberation},{name:'档案室',desc:'整理和保存历次卷宗',image:sceneAssets.archive},{name:'判决书纸张',desc:'独立判决书的纸面底图',image:sceneAssets.verdict}];
@@ -108,6 +109,22 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       soft:['本庭理解生活有时不容易，但理解不代表可以继续添乱。','考虑到被告仍有改正空间，本庭决定温和地重判一次。','希望被告记住：体谅是情分，不是无限次豁免。'],
       chaos:['书记员在记录时笑出了声，但判决依然具有仪式感。','本案超出常规理解范围，故交由快乐法典临时处理。','法官沉思三秒后决定：先罚再说，细节由命运补充。']
     };
+
+    const settleSentences={
+      strict:['双方当庭和解，被告须提交一份书面改进计划。','本庭不予实刑，责令被告书面致歉并限期整改。','证据不足以定罪，本庭责令双方约定一个不再犯的时间表。'],
+      soft:['双方握手言和，被告承诺下次手下留情。','本庭责令被告请当事人喝一杯喜欢的饮料，就此了结。','不予处罚，但被告须在当事人下次抱怨时立刻认错。'],
+      chaos:['本庭判决双方一起睡个好觉，谁也不许再闹。','责令被告陪当事人过一个不被打扰的下午。','罚被告旁听三分钟静音，不得反驳。']
+    };
+    const settlePenalties={
+      strict:['和解后三个月内不得再犯，书记员保留复查权。','被告须提交可执行日期，逾期转为实刑。','双方各退一步，但被告须书面确认。'],
+      soft:['和解生效，前提是被告真的记得。','本庭给予一次改过机会，下次不再温和。','由青蛙书记员监督执行，直至当事人满意。'],
+      chaos:['和解条款由命运抽签决定，本庭保留解释权。','附加一杯饮料，冰块由对方挑。','双方合影一张，作为和解凭证归档。']
+    };
+    const settleComments={
+      strict:['单一证据不足以支撑实刑，但本庭已经记下这一笔。','事实基本成立，量罚从宽，整改从严。','本庭不接受含糊，但也不接受没有证据的重判。'],
+      soft:['生活已经够难了，本庭这次选择各打五十大板。','证据只有一条，本庭决定温柔地放过它，也放过你。','和解不是免罚，是给你省一点力气。'],
+      chaos:['书记员建议和解，法官看了看时间，同意了。','本案荒诞程度不足以判刑，但足以让人共情。','本庭宣布：罚双方一起去休息。']
+    };
     const pickOne=function(list){return list[Math.floor(Math.random()*list.length)]};
     const evidenceFor=function(target){const specific=target&&caseEvidence[target.id]?caseEvidence[target.id]:[];return specific.concat(evidence).slice(0,6)};
     const chargesFor=function(target){const specific=target&&caseCharges[target.id]?caseCharges[target.id]:[];return Array.from(new Set([target&&target.suggested,state.charge].filter(Boolean).concat(specific,charges))).slice(0,8)};
@@ -122,76 +139,491 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
     const sentencePool = ['有期徒刑 365 天','强制静音 30 天','罚没 1000 快乐币','责令公开道歉 3 次','暂停营业一个周末','强制整改至人类满意为止'];
     const judgeStyles = [{id:'strict',name:'铁面无私型',intro:'证据不足？那就再找一条。',seal:'公'},{id:'soft',name:'看似温柔型',intro:'语气温和，判罚不轻。',seal:'审'},{id:'chaos',name:'混沌随机型',intro:'判决结果连书记员都想不到。',seal:'判'}];
     const storeKey='wanniu-court-github-v1';
-    let state={page:'home',step:1,category:'all',query:'',target:null,charge:'',evidence:[],judge:'strict',history:[],result:null,customOpen:false,custom:'',galleryTab:'cases',caseMode:'manual',appealOf:null,appealRound:0,posterBlob:null,posterUrl:null,posterFilename:''};
+    let state={page:'home',step:1,category:'all',query:'',target:null,charge:'',evidence:[],judge:'strict',history:[],result:null,customOpen:false,custom:'',galleryTab:'cases',archiveTab:'all',caseMode:'manual',appealOf:null,appealRound:0,posterBlob:null,posterUrl:null,posterFilename:''};
     try{const stored=JSON.parse(localStorage.getItem(storeKey)||'[]');state.history=Array.isArray(stored)?stored.slice(0,80):[]}catch(e){state.history=[]}
     const app=document.getElementById('app');
     const esc=function(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
     const catName=function(id){const c=categories.find(x=>x.id===id);return c?c.label:'自定义案件'};
-    const showToast=function(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.remove('hidden');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>el.classList.add('hidden'),2300)};
-    const button=function(label,action,klass){return '<button class="button '+(klass||'primary')+'" data-action="'+action+'">'+label+'</button>'};
-    const navActive=function(page){document.querySelectorAll('.nav button,.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.action===page))};
+    const showToast=function(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('is-on');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>el.classList.remove('is-on'),2400)};
     const save=function(){try{localStorage.setItem(storeKey,JSON.stringify(state.history.slice(0,80)))}catch(e){}};
-    function home(){const daily=getDailyDocket();const dailyDone=state.history.some(function(item){return item.source==='daily'&&item.dailyDate===daily.dateKey});return '<section class="hero"><div class="hero-stage"><img class="hero-background" src="'+sceneAssets.hero+'" alt="复古木刻风格的万物审判庭大厅"><div class="hero-copy"><div class="eyebrow">本庭今日开庭 · 第 001 号</div><h1>这点小事，<br><em>也值得开庭。</em></h1><p>周一、闹钟、已读不回……<br>那些说不清的小烦恼，来这里走个流程。<br>选一个被告，提交指控，等法官给你一个交代。</p><div class="hero-actions">'+button('随机开庭','random','primary')+button('自己选个被告　＋','trial','secondary')+'</div><div class="hero-foot">无需注册 · 三步生成判决 · 纯属娱乐</div></div><span class="hero-index">NO. 001 / EST. FOR EVERY LITTLE THING</span></div><div class="hero-caption"><span>THE COURT OF EVERY LITTLE THING</span><b>万物皆可审，认真但不必当真。</b></div></section>'+
-      '<section class="section"><div class="section-head"><div><span class="kicker">CASE INDEX / 案件目录</span><h2>从哪个麻烦开始？</h2></div><span class="section-note">'+defendants.length+' 位常驻被告 · 也可自定义</span></div><div class="category-grid">'+categories.map(c=>'<button class="category" data-action="category" data-id="'+c.id+'"><span class="category-art"><img loading="lazy" src="'+categoryAssets[c.id]+'" alt=""></span><span class="category-copy"><strong>'+c.label+'</strong><small>'+c.desc+'</small><i>'+defendants.filter(d=>d.category===c.id).length+' 件常驻案件</i></span><span class="category-arrow">↗</span></button>').join('')+'</div></section>'+
-      '<section class="section"><div class="section-head"><div><span class="kicker">DAILY DOCKET / 每日专属案件</span><h2>今日值班案件</h2></div><span class="section-note">每日 00:00 更新 · '+daily.dateLabel+'</span></div><button class="daily-card" data-action="daily"><div class="daily-art"><img src="'+daily.defendant.image+'" alt="'+daily.defendant.title+'案件插画"></div><div class="daily-meta"><small>NO. '+daily.edition+' / TODAY\'S CASE</small><strong>'+daily.defendant.title+'</strong><span>'+daily.defendant.subtitle+'</span><i class="daily-status">'+(dailyDone?'今日已结案 · 可再次审理':'今日案件待审 · 完成后收入卷宗')+'</i></div><span class="text-link">'+(dailyDone?'再次审理　↻':'立即开庭　→')+'</span></button></section>'+
-      '<section class="section editorial-split"><div class="editorial-picture"><img src="'+sceneAssets.filing+'" alt="复古立案大厅"><span class="picture-caption">THE COURT IS OPEN</span></div><div class="editorial-copy"><span class="kicker">NOTICE FROM THE BENCH</span><h2>本庭不大，<br><em>但很较真。</em></h2><ul class="steps"><li><b>01</b><div><strong>点名被告</strong><small>可以从常驻名单里选，也可以自己加一个。</small></div></li><li><b>02</b><div><strong>列出罪名</strong><small>把心里那点不爽，整理成正式指控。</small></div></li><li><b>03</b><div><strong>提交证据</strong><small>由本庭法官给出一份荒唐但完整的判决。</small></div></li></ul><button class="text-link" data-action="trial" style="margin-top:15px">现在去立案　→</button></div></section>'+
-      '<section class="section exhibits"><div><span class="kicker">EXHIBITS / 本庭常见物证</span><h2>法槌、天平、一本法典，<br><em>生活小事也要认真开庭。</em></h2><p>每一份离谱指控，都需要一点仪式感。把小烦恼递上来，本庭会郑重其事地处理。</p></div><div class="exhibit-objects"><div class="exhibit-object"><img src="'+propAssets.gavel+'" alt="法槌"></div><div class="exhibit-object"><img src="'+propAssets.scales+'" alt="天平"></div><div class="exhibit-object"><img src="'+propAssets.folder+'" alt="案件卷宗"></div></div></section>'+
-      '<section class="section"><div class="section-head"><div><span class="kicker">THE COURT PEOPLE / 本庭人物</span><h2>审判席上的几位常客</h2></div><span class="section-note">他们都有自己的脾气</span></div><div class="staff-grid">'+courtCharacters.map(person=>'<article class="staff"><img src="'+person.image+'" alt="'+person.name+'"><div class="staff-caption"><small>'+person.role+'</small><strong>'+person.name+'</strong></div></article>').join('')+'</div></section>'+
-      '<section class="section"><div class="section-head"><div><span class="kicker">RECENT VERDICTS / 最近宣判</span><h2>刚刚发生的审判</h2></div><button class="text-link" data-action="archive">查看全部　→</button></div>'+(state.history.length?'<div class="archive-list">'+state.history.slice(0,3).map(item=>'<article class="archive-item"><span class="category-art" style="width:42px;height:45px;font-size:17px">'+esc(item.mark||'卷')+'</span><div><strong>'+esc(item.target)+'</strong><small>'+esc(item.charge)+' · '+esc(item.sentence)+'</small></div><button data-action="open-verdict" data-id="'+esc(item.id)+'">查看判决 →</button></article>').join('')+'</div>':'<div class="empty"><strong>卷宗室还很安静</strong><p>完成第一次审判后，判决书会收录在这里。</p></div>')+'</section>';}
-    function progress(){return '<div class="progress">'+[1,2,3].map((n)=>'<div class="progress-step '+(state.step===n?'active':'')+'"><b>'+(state.step>n?'✓':n)+'</b>'+['选择被告','提交罪名','呈上证据'][n-1]+'</div>'+(n<3?'<span class="progress-line"></span>':'')).join('')+'</div>'}
-    function trial(){let body='';if(state.step===1){const filtered=defendants.filter(d=>(state.category==='all'||d.category===state.category)&&(!state.query||(d.title+d.subtitle).includes(state.query)));body='<div class="step-illustration"><img src="'+sceneAssets.hall+'" alt=""><span>本庭受理一切生活琐事</span></div><div class="step-title"><small>立案 · 01 / 选择被告</small><h2>今天，想告谁？</h2><p>不用客气，所有离谱行为都值得被认真记录。</p></div><label class="case-search"><span>⌕</span><input id="case-search" type="search" placeholder="搜索被告或生活麻烦" value="'+esc(state.query||'')+'"></label><div class="filter-row"><button class="chip '+(state.category==='all'?'active':'')+'" data-action="filter" data-id="all">全部</button>'+categories.map(c=>'<button class="chip '+(state.category===c.id?'active':'')+'" data-action="filter" data-id="'+c.id+'">'+c.label+'</button>').join('')+'</div><div class="case-grid">'+filtered.map(d=>'<button class="case-option '+(state.target&&state.target.id===d.id?'selected':'')+'" data-action="target" data-id="'+d.id+'"><span class="case-glyph"><img loading="lazy" src="'+d.image+'" alt=""></span><span class="option-copy"><strong>'+d.title+'</strong><small>'+d.subtitle+'</small></span><span class="option-check">'+(state.target&&state.target.id===d.id?'✓':'＋')+'</span></button>').join('')+'</div><div class="custom-box"><button class="custom-toggle" data-action="custom-toggle"><strong>＋ 名单里没有？自定义被告</strong><small>比如：永远不回消息的外卖骑手、我的周末计划</small></button>'+(state.customOpen?'<div class="custom-input"><input id="custom-name" maxlength="18" placeholder="输入 2–18 个字的被告名称" value="'+esc(state.custom)+'"><button class="button primary" data-action="custom-use">确认被告</button></div>':'')+'</div><div class="step-actions"><button class="button secondary" data-action="home">暂时撤诉</button><button class="button primary" data-action="next" '+(!state.target?'disabled':'')+'>下一步：选择罪名　→</button></div>'}
-      if(state.step===2){body='<div class="step-illustration"><img src="'+characterAssets.cat+'" alt="猫律师"><span>指控应当具体，罪名可以抽象</span></div><div class="step-title"><small>指控 · 02 / 选择罪名</small><h2>给它定个罪名。</h2><p>请选一项最符合事实的指控。</p></div><div class="selected-case"><b>'+esc(state.target?state.target.title:state.custom)+'</b><span>当前被告 · '+(state.target?catName(state.target.category):'自定义案件')+'</span></div><div class="charge-grid">'+chargesFor(state.target).map((c,i)=>'<button class="charge-option '+(state.charge===c?'selected':'')+'" data-action="charge" data-id="'+esc(c)+'"><span class="case-glyph" style="width:40px;height:40px;flex-basis:40px">§'+String(i+1).padStart(2,'0')+'</span><span class="option-copy"><strong>'+c+'</strong><small>本庭娱乐罪名 · '+(i%2?'持续性行为':'情绪与时间相关')+'</small></span><span class="option-check">'+(state.charge===c?'✓':'＋')+'</span></button>').join('')+'</div><div class="step-actions"><button class="button secondary" data-action="back">← 上一步</button><button class="button primary" data-action="next" '+(!state.charge?'disabled':'')+'>下一步：提交证据　→</button></div>'}
-      if(state.step===3){body='<div class="step-illustration"><img src="'+characterAssets.rabbit+'" alt="生活物证"><span>证据不必充分，但态度必须坚决</span></div><div class="step-title"><small>举证 · 03 / 呈上证据</small><h2>证据呈上，准备开庭。</h2><p>选择 1–2 条最有说服力的证据；每位被告都有自己的案件线索。</p></div><div class="selected-case"><b>'+esc(state.target?state.target.title:state.custom)+'</b><span>指控：'+esc(state.charge)+'</span></div><div class="evidence-grid">'+evidenceFor(state.target).map((e,i)=>'<button class="evidence-option '+(state.evidence.includes(e)?'selected':'')+'" data-action="evidence" data-id="'+esc(e)+'" '+(!state.evidence.includes(e)&&state.evidence.length>=2?'disabled':'')+'><span class="option-check">'+(state.evidence.includes(e)?'✓':'＋')+'</span><span class="option-copy"><strong>'+e+'</strong><small>证据编号 · '+String(i+1).padStart(2,'0')+'</small></span></button>').join('')+'</div><div class="step-title" style="margin-bottom:8px"><small>JUDGE STYLE / 法官风格</small><h2 style="font-size:20px">今天由谁来判？</h2></div><div class="judge-options">'+judgeStyles.map(j=>'<button class="judge-option '+(state.judge===j.id?'selected':'')+'" data-action="judge" data-id="'+j.id+'"><strong>'+j.seal+'　'+j.name+'</strong><small>'+j.intro+'</small></button>').join('')+'</div><div class="step-actions"><button class="button secondary" data-action="back">← 上一步</button><button class="button primary" data-action="verdict" '+(!state.evidence.length?'disabled':'')+'>正式开庭　⚖</button></div>'}
-      return '<section class="page"><div class="page-top"><button class="back" data-action="home">← 返回首页</button><span>立案大厅 / INTAKE DESK</span></div><div class="trial-shell">'+progress()+body+'</div></section>'}
-        function makeVerdict(){
+
+/* ==========================================================================
+   Presentation layer
+   ========================================================================== */
+    const sheetEl=document.getElementById('sheet');
+    const icon=function(name,cls){return '<svg class="ic'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#i-'+name+'"/></svg>'};
+    const art=function(src,cls,alt,lazy){return '<span class="art'+(cls?' '+cls:'')+'"><img loading="'+(lazy===false?'eager':'lazy')+'" decoding="async" src="'+src+'" alt="'+esc(alt||'')+'"></span>'};
+    const outcomeOf=function(v){return v&&v.outcome?v.outcome:'guilty'};
+    const outcomeLabel=function(v){return outcomeOf(v)==='guilty'?'有罪':'责令和解'};
+    const outcomeBadge=function(v){return '<span class="badge '+(outcomeOf(v)==='guilty'?'badge--guilty':'badge--settle')+'">'+outcomeLabel(v)+'</span>'};
+
+    /* ---------- routes ---------- */
+    const routeOf={home:'#/',trial:'#/trial',processing:'#/trial',result:'#/verdict',archive:'#/archive',gallery:'#/gallery'};
+    let routing=false;
+    function syncHash(){const want=routeOf[state.page]||'#/';if(window.location.hash!==want){routing=true;history.replaceState(null,'',want);routing=false}}
+    function pageFromHash(hash){
+      if(hash==='#/trial')return 'trial';
+      if(hash==='#/archive')return 'archive';
+      if(hash==='#/gallery')return 'gallery';
+      if(hash==='#/verdict')return state.result?'result':'home';
+      return 'home';
+    }
+    window.addEventListener('popstate',function(){
+      if(routing)return;
+      const page=pageFromHash(window.location.hash||'#/');
+      if(page==='trial'){openTrial()}
+      else if(page!==state.page){state.page=page;render()}
+    });
+
+    function openTrial(){
+      state.page='trial';state.step=1;state.category='all';state.query='';state.target=null;
+      state.charge='';state.evidence=[];state.custom='';state.customOpen=false;
+      state.caseMode='manual';state.appealOf=null;state.appealRound=0;render();
+    }
+
+    /* ---------- shared fragments ---------- */
+    function crumb(back,backAction,trail){
+      return '<div class="crumb"><button class="back" data-action="'+(backAction||'home')+'">'+icon('back')+'<span>'+esc(back)+'</span></button><span class="trail">'+esc(trail)+'</span></div>';
+    }
+    function stepper(){
+      const names=['选择被告','确定指控','呈上证据'];
+      let out='';
+      for(let n=1;n<=3;n++){
+        const cls=state.step===n?'is-on':(state.step>n?'is-done':'');
+        out+='<div class="st '+cls+'"><b>'+(state.step>n?'✓':n)+'</b><span>'+names[n-1]+'</span></div>';
+        if(n<3)out+='<div class="ln"></div>';
+      }
+      return '<div class="stepper">'+out+'</div>';
+    }
+    function ornament(){return '<div class="ornament"><img src="'+decor.divider+'" alt="" loading="lazy"></div>'}
+    function actionbar(inner){return '<div class="pickbar">'+inner+'</div>'}
+
+    /* ---------- home ---------- */
+    function home(){
+      const daily=getDailyDocket();
+      const dailyDone=state.history.some(function(x){return x.source==='daily'&&x.dailyDate===daily.dateKey});
+      const counts=categories.map(function(c){return c.id+':'+defendants.filter(function(d){return d.category===c.id}).length});
+      return '<div class="fade-in">'+
+      '<section class="hero panel">'+
+        '<div class="art hero-art">'+
+          '<span class="hero-flag"><i class="dot"></i>本庭今日开庭 · 第 '+daily.edition+' 号</span>'+
+          '<img fetchpriority="high" src="'+sceneAssets.hero+'" alt="复古木刻风格的万物审判庭大厅">'+
+        '</div>'+
+        '<div class="hero-body">'+
+          '<span class="eyebrow">Court of Every Little Thing</span>'+
+          '<h1 class="display">这点小事，<br><em>也值得开庭。</em></h1>'+
+          '<p class="lede">周一、闹钟、已读不回……那些说不清的小烦恼，来这里走个流程。选一个被告，提交指控，等法官给你一个交代。</p>'+
+          '<div class="hero-cta">'+
+            '<button class="btn btn--plaque" data-action="random">随机开庭</button>'+
+            '<button class="btn btn--ticket" data-action="trial">自己选被告</button>'+
+          '</div>'+
+          '<div class="hero-foot"><span>无需注册</span><i class="sep"></i><span>三步生成判决</span><i class="sep"></i><span>纯属娱乐</span></div>'+
+        '</div>'+
+      '</section>'+
+
+      '<div class="quick">'+
+        quickItem('quill','正式立案','三步起诉')+
+        quickItem('dice','随机速审','交给命运')+
+        quickItem('archive','我的卷宗',state.history.length+' 份')+
+        quickItem('book','法庭图鉴','52 件')+
+      '</div>'+
+
+      '<section class="daily">'+
+        '<span class="daily-ribbon"><img src="'+decor.section+'" alt=""><span>今日值班案件</span><span class="ed">'+esc(daily.dateLabel)+'</span></span>'+
+        '<div class="daily-inner">'+
+          art(daily.defendant.image,'','被告 '+daily.defendant.title)+
+          '<div>'+
+            '<span class="daily-tag">'+icon('flame')+'第 '+daily.edition+' 号 · 每日 00:00 轮换</span>'+
+            '<h3>'+esc(daily.defendant.title)+'</h3>'+
+            '<p>'+esc(daily.defendant.subtitle)+'</p>'+
+            '<div class="daily-meta">'+
+              '<span>本庭已排期</span>'+
+              '<span class="daily-cta">'+(dailyDone?'<button class="btn btn--ghost" data-action="daily">再审一次</button>':'<button class="btn btn--solid" data-action="daily">立即开庭</button>')+'</span>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</section>'+
+
+      ornament()+
+
+      '<section class="sec">'+
+        '<div class="sec-hd"><h2 class="display">从哪个麻烦开始？</h2><span class="sub">16 位常驻被告</span></div>'+
+        '<div class="cat-grid">'+categories.map(function(c,i){
+          const n=defendants.filter(function(d){return d.category===c.id}).length;
+          return '<button class="cat-card" data-action="category" data-id="'+c.id+'">'+
+            '<span class="cnt">'+n+' 件</span>'+
+            art(categoryAssets[c.id],'','')+
+            '<strong>'+esc(c.label)+'</strong>'+
+            '<span>'+esc(c.desc)+'</span>'+
+          '</button>';
+        }).join('')+'</div>'+
+      '</section>'+
+
+      '<section class="notice">'+
+        '<h3>本庭须知</h3>'+
+        '<dl>'+
+          '<div><dt>一</dt><dd>本庭为娱乐性质，所有判决均不构成法律意见，也不代表任何真实机构。</dd></div>'+
+          '<div><dt>二</dt><dd>卷宗仅保存在本机浏览器中，不上传、不联网、不读取任何社交账号。</dd></div>'+
+          '<div><dt>三</dt><dd>证据满两条即视为充分；单一证据遇上温和型审判官，本庭可能责令和解。</dd></div>'+
+        '</dl>'+
+      '</section>'+
+      '<div class="colophon"><span>No. 001</span><span>Est. for every little thing</span><span>万物皆可审</span><span>认真但不必当真</span></div>'+
+      '</div>';
+    }
+    function quickItem(ic,label,sub){
+      const map={quill:'trial',dice:'random',archive:'archive',book:'gallery'};
+      return '<button class="quick-item" data-action="'+map[ic]+'"><svg class="ic" aria-hidden="true"><use href="#i-'+ic+'"/></svg><span>'+esc(label)+'</span><small>'+esc(sub)+'</small></button>';
+    }
+
+    /* ---------- intake ---------- */
+    function trial(){
+      let body='';
+      if(state.step===1)body=stepTarget();
+      else if(state.step===2)body=stepCharge();
+      else body=stepEvidence();
+      return '<div class="fade-in">'+crumb('返回审判庭','home','Intake Desk · 立案大厅')+stepper()+body+'</div>';
+    }
+
+    function stepTarget(){
+      const q=(state.query||'').trim().toLowerCase();
+      const list=defendants.filter(function(d){
+        if(state.category!=='all'&&d.category!==state.category)return false;
+        if(!q)return true;
+        return (d.title+' '+d.subtitle+' '+catName(d.category)).toLowerCase().includes(q);
+      });
+      return '<div class="screen" style="padding-bottom:4px">'+
+          '<span class="band"><img src="'+sceneAssets.filing+'" alt="立案受理处"><span class="band-tag">本庭受理一切生活琐事</span></span>'+
+          '<span class="eyebrow">立案 · 01 / 选择被告</span>'+
+          '<h2 class="display">今天，想告谁？</h2>'+
+          '<p class="lede">不用客气，所有离谱行为都值得被认真记录。</p>'+
+        '</div>'+
+        '<label class="searchbar">'+icon('loupe')+
+          '<input id="case-search" type="search" inputmode="search" autocomplete="off" placeholder="搜索被告或生活麻烦" value="'+esc(state.query||'')+'">'+
+          (state.query?'<button class="clear" data-action="clear-query" aria-label="清空搜索">'+icon('close')+'</button>':'<span aria-hidden="true"></span>')+
+        '</label>'+
+        '<div class="chips" style="margin:12px var(--gutter) 0">'+
+          '<button class="chip'+(state.category==='all'?' is-on':'')+'" data-action="filter" data-id="all">全部</button>'+
+          categories.map(function(c){return '<button class="chip'+(state.category===c.id?' is-on':'')+'" data-action="filter" data-id="'+c.id+'">'+esc(c.label)+'</button>'}).join('')+
+        '</div>'+
+        (list.length?'<div class="def-grid">'+list.map(function(d){
+          const on=state.target&&state.target.id===d.id;
+          return '<button class="def-card'+(on?' is-on':'')+'" data-action="target" data-id="'+d.id+'" aria-pressed="'+(on?'true':'false')+'">'+
+            '<span class="tick">'+icon('check')+'</span>'+
+            art(d.image,'',d.title)+
+            '<strong>'+esc(d.title)+'</strong>'+
+            '<span>'+esc(d.subtitle)+'</span>'+
+          '</button>';
+        }).join('')+'</div>':
+        '<div class="empty"><strong>名单里暂时没有这位被告</strong><p>换个关键词，或者把它写进诉状里。</p></div>')+
+        '<div class="custom'+(state.customOpen?' is-open':'')+'">'+
+          '<button class="custom-toggle" data-action="custom-toggle" aria-expanded="'+(state.customOpen?'true':'false')+'">'+
+            icon('plus','exp')+
+            '<span><b>名单里没有？自定义一位被告</b><small>例如：永远不回消息的房东、我的周末计划</small></span>'+
+          '</button>'+
+          (state.customOpen?'<div class="custom-body">'+
+            '<div class="field"><label for="custom-name">被告名称</label>'+
+            '<input id="custom-name" maxlength="18" placeholder="2–18 个字，写清是谁" value="'+esc(state.custom)+'">'+
+            '<span class="counter">'+(state.custom||'').length+' / 18</span></div>'+
+            '<button class="btn btn--solid btn--block" data-action="custom-use">确认被告并进入指控'+icon('arrow')+'</button>'+
+          '</div>':'')+
+        '</div>'+
+        actionbar(state.target||state.custom?
+          '<span class="art">'+(state.target?'<img src="'+state.target.image+'" alt="">':'<img src="'+propAssets.scroll+'" alt="">')+'</span>'+
+          '<span class="who"><strong>'+esc(state.target?state.target.title:state.custom)+'</strong><small>'+(state.target?catName(state.target.category):'自定义被告')+'</small></span>'+
+          '<button class="btn btn--solid" data-action="next">下一步'+icon('arrow')+'</button>'
+          :'<span class="art">'+('<img src="'+propAssets.magnifier+'" alt="">')+'</span><span class="who"><strong>还没有选定被告</strong><small>点一张卡片，或自定义一位</small></span>');
+    }
+
+    function stepCharge(){
+      const who=state.target||{title:state.custom||'未具名被告',category:'custom'};
+      const list=chargesFor(who);
+      const suggested=state.target?state.target.suggested:'';
+      return '<div class="screen" style="padding-bottom:4px">'+
+          '<span class="eyebrow">立案 · 02 / 确定指控</span>'+
+          '<h2 class="display">给它定个罪名。</h2>'+
+          '<p class="lede">本庭已根据「'+esc(who.title)+'」的过往行为拟定以下指控，选一条最贴切的。</p>'+
+        '</div>'+
+        '<div class="charge-grid">'+list.map(function(c){
+          const on=state.charge===c;
+          return '<button class="charge'+(on?' is-on':'')+'" data-action="charge" data-id="'+esc(c)+'" aria-pressed="'+(on?'true':'false')+'">'+
+            '<span class="box">'+icon('check')+'</span>'+
+            '<span><strong>'+esc(c)+'</strong><small>'+(c===suggested?'本庭建议指控 · 与该被告高度相关':'经书记员检索，符合本案情节')+'</small></span>'+
+          '</button>';
+        }).join('')+'</div>'+
+        '<div class="sec" style="margin-bottom:0"><div class="sec-hd"><h3 class="display" style="font-size:16px">选择审判官</h3><span class="sub">影响判罚与点评</span></div></div>'+
+        '<div class="judge-row" style="margin-top:0">'+judgeStyles.map(function(j){
+          return '<button class="judge'+(state.judge===j.id?' is-on':'')+'" data-action="judge" data-id="'+j.id+'" aria-pressed="'+(state.judge===j.id?'true':'false')+'">'+
+            '<span class="seal">'+j.seal+'</span><strong>'+esc(j.name)+'</strong><small>'+esc(j.intro)+'</small></button>';
+        }).join('')+'</div>'+
+        actionbar('<span class="art">'+art(state.target?state.target.image:propAssets.scroll,'','')+'</span>'+
+          '<span class="who"><strong>'+esc(state.charge||'尚未选择罪名')+'</strong><small>'+esc(who.title)+' · '+esc((judgeStyles.find(function(j){return j.id===state.judge})||judgeStyles[0]).name)+'</small></span>'+
+          '<button class="btn btn--solid" data-action="next">下一步'+icon('arrow')+'</button>');
+    }
+
+    function stepEvidence(){
+      const who=state.target||{title:state.custom||'未具名被告'};
+      const list=evidenceFor(who);
+      const full=state.evidence.length>=2;
+      return '<div class="screen" style="padding-bottom:4px">'+
+          '<span class="eyebrow">立案 · 03 / 呈上证据</span>'+
+          '<h2 class="display">拿出你的证据。</h2>'+
+          '<p class="lede">最多呈上两条。证据越具体，判决越有说服力——只交一条，温和的审判官可能判你和解。</p>'+
+        '</div>'+
+        '<div class="tray" style="margin:12px var(--gutter)">'+icon('envelope')+
+          '<span>书记员已接收 '+state.evidence.length+' 项证据</span><b>'+state.evidence.length+' / 2</b></div>'+
+        '<div style="margin:0 var(--gutter)">'+list.map(function(e,i){
+          const on=state.evidence.includes(e);
+          return '<button class="exhibit'+(on?' is-on':(full?' is-locked':''))+'" data-action="evidence" data-id="'+esc(e)+'" aria-pressed="'+(on?'true':'false')+'"'+(full&&!on?' aria-disabled="true"':'')+'>'+
+            '<span class="no">'+(on?state.evidence.indexOf(e)+1:i+1)+'</span>'+
+            '<span class="txt">'+esc(e)+'</span>'+
+            '<span class="mark">'+icon('check')+'</span>'+
+          '</button>';
+        }).join('')+'</div>'+
+        actionbar('<span class="art"><img src="'+propAssets.envelope+'" alt=""></span>'+
+          '<span class="who"><strong>'+esc(who.title)+'</strong><small>'+esc(state.charge)+' · 证据 '+state.evidence.length+' 项</small></span>'+
+          '<button class="btn btn--solid" data-action="verdict"'+(state.evidence.length?'':' disabled')+'>提交审理'+icon('gavel')+'</button>');
+    }
+
+    /* ---------- deliberation ---------- */
+    const delibSteps=['核查案件材料','听取当事人陈述','合议庭评议量刑','书记员誊写判决书'];
+    let delibTimer=null,delibStage=0;
+    function processing(){
+      const style=(judgeStyles.find(function(j){return j.id===state.judge})||judgeStyles[0]);
+      const who=state.target?state.target.title:state.custom;
+      return '<div class="fade-in">'+crumb('退回旁听','home','Deliberation · 合议庭')+
+      '<section class="delib panel">'+
+        '<div class="art delib-art"><span class="caption"><img src="'+decor.deliberation+'" alt=""><span>合议庭 · 正在评议</span></span><img src="'+sceneAssets.deliberation+'" alt="复古木刻风格的合议室"></div>'+
+        '<div class="delib-body">'+
+          '<div class="delib-staff"><img src="'+characterAssets.hedgehog+'" alt="刺猬执法官"><img src="'+characterAssets.frog+'" alt="青蛙书记员"><span>执法官与书记员<br>正在核对卷宗</span></div>'+
+          '<span class="eyebrow">The Court Is In Session</span>'+
+          '<h2 class="display">正在审理「'+esc(who)+'」。</h2>'+
+          '<p class="lede">'+icon('gavel')+' '+esc(style.name)+'审判官已入席，书记员正在核对 '+state.evidence.length+' 项证据。</p>'+
+          '<div class="delib-steps" id="delib-steps">'+delibSteps.map(function(s,i){
+            const st=delibStage>i?'is-done':(delibStage===i?'is-run':'');
+            return '<div class="delib-step '+st+'"><span class="mk">'+(delibStage>i?icon('check'):(delibStage===i?icon('gavel'):'<i class="ring"></i>'))+'</span><span>'+esc(s)+'</span><span class="t">'+(delibStage>i?'done':'…')+'</span></div>';
+          }).join('')+'</div>'+
+          '<div class="delib-foot"><div class="meter"><i id="delib-meter" style="width:'+Math.round(delibStage/delibSteps.length*100)+'%"></i></div><img src="'+propAssets.hourglass+'" alt=""></div>'+
+        '</div>'+
+      '</section></div>';
+    }
+    function advanceDelib(){
+      const box=document.getElementById('delib-steps');
+      if(!box)return;
+      delibStage++;
+      const bars=document.getElementById('delib-meter');
+      if(bars)bars.style.width=Math.min(100,Math.round(delibStage/delibSteps.length*100))+'%';
+      Array.prototype.forEach.call(box.children,function(row,i){
+        row.className='delib-step '+(delibStage>i?'is-done':(delibStage===i?'is-run':''));
+        row.querySelector('.mk').innerHTML=delibStage>i?icon('check'):(delibStage===i?icon('gavel'):'<i class="ring"></i>');
+        row.querySelector('.t').textContent=delibStage>i?'done':'…';
+      });
+      if(delibStage>=delibSteps.length){clearInterval(delibTimer);delibTimer=null;window.setTimeout(makeVerdict,520)}
+    }
+
+    /* ---------- verdict ---------- */
+    function verdict(v){
+      v=v||state.result;if(!v)return '';
+      const outcome=outcomeOf(v);
+      const appealLabel=v.appealRound?'第 '+(v.appealRound+1)+' 次审理':'初审判决';
+      const caseType=v.source==='daily'?'每日专属案件':v.source==='quick'?'随机速审':v.source==='appeal'?'再审案件':'正式立案';
+      const reactions=[{id:'fair',label:'判得刚好',ic:'check'},{id:'light',label:'判得太轻',ic:'plus'},{id:'heavy',label:'判得太重',ic:'close'}];
+      return '<div class="fade-in">'+
+      '<div class="verdict-head">'+
+        '<div class="declare"><span class="seal">宣</span><span class="eyebrow">The Verdict Is In · '+esc(caseType)+' · '+appealLabel+'</span></div>'+
+        '<h1 class="display">'+(v.appealRound?'再审结束。':'审判结束。')+'<em>判决如下。</em></h1>'+
+        '<p class="lede">'+(v.appealRound?'本庭已重新听取证据，并作出新的裁定。':'本庭已完成审理，卷宗已归档。现在轮到你来看看判得合不合理。')+'</p>'+
+      '</div>'+
+      '<article class="doc">'+
+        '<div class="doc-body">'+
+          '<div class="doc-head">Court of Every Little Thing</div>'+
+          '<div class="doc-title"><img class="laurel" src="'+propAssets.laurel+'" alt=""><h2>'+(outcome==='guilty'?'刑事判决书':'和解书')+'</h2>'+
+            '<small>娱乐法庭 · '+esc(appealLabel)+'</small></div>'
+          +'<div class="doc-docket">案号 '+esc(v.docket)+'</div>'+
+          '<div class="doc-row"><b>被告</b><div class="v"><strong>'+esc(v.target)+'</strong>'+
+            '<span class="sub">'+esc(v.category?catName(v.category):'自定义案件')+' · '+esc(caseType)+'</span></div></div>'+
+          '<div class="doc-row"><b>罪名</b><div class="v"><strong>'+esc(v.charge)+'</strong>'+
+            '<span class="sub">'+(outcome==='guilty'?'经本庭审理，相关行为已造成持续性精神损耗。':'指控成立但情节显著轻微，本庭未予实刑。')+'</span></div></div>'+
+          '<div class="doc-focus"><small>本案争议焦点</small><p>'+esc(v.finding||'本庭已完成对相关行为的审理。')+'</p></div>'+
+          '<div class="doc-row"><b>证据</b><div class="v">'+
+            ((v.evidence||[]).length?'<ol>'+v.evidence.map(function(e){return '<li>'+esc(e)+'</li>'}).join('')+'</ol>':'<span class="sub">当事人陈述已记录在案。</span>')+
+          '</div></div>'+
+          '<div class="doc-verdict'+(outcome==='guilty'?'':' is-settle')+'">'+
+            '<span class="label">'+(outcome==='guilty'?'判决如下':'责令和解')+'</span>'+
+            '<div class="sentence"><strong>'+esc(v.sentence)+'</strong><small>'+esc(outcome==='guilty'?'附加处罚：'+v.penalty:'和解条件：'+v.penalty)+'</small></div>'+
+          '</div>'+
+          '<div class="doc-comment"><div><div class="who">审判官 · '+esc(v.judge)+'</div><p>'+esc(v.judgeComment)+'</p></div>'+
+            '<div class="stamp"><b>审</b>判决生效</div></div>'+
+          '<div class="doc-foot"><span>'+esc(v.date)+'</span><span class="r">纯属娱乐 · 不具法律效力</span></div>'+
+        '</div>'+
+      '</article>'+
+      '<section class="reaction panel panel-pad">'+
+        '<h3 class="display" style="font-size:16px">你觉得这份判决合理吗？</h3>'+
+        '<p class="hint">选一个态度，它会留在这份本地卷宗里。</p>'+
+        '<div class="reaction-grid">'+reactions.map(function(r){
+          return '<button class="'+(v.reaction===r.id?'is-on':'')+'" data-action="reaction" data-id="'+r.id+'" aria-pressed="'+(v.reaction===r.id?'true':'false')+'">'+icon(r.ic)+'<span>'+r.label+'</span></button>';
+        }).join('')+'</div>'+
+        (v.reaction?'<p class="hint" style="margin-top:10px">'+(v.reaction==='fair'?'已记录：判得刚好':v.reaction==='light'?'已记录：判得太轻，下次可以多交一条证据':'已记录：判得太重')+'</p>':'')+
+      '</section>'+
+      '<div class="action-grid">'+
+        '<button class="btn btn--solid" data-action="poster">'+icon('share')+'<span>判决海报</span></button>'+
+        '<button class="btn btn--ink" data-action="copy">'+icon('copy')+'<span>复制文案</span></button>'+
+        '<button class="btn btn--ghost" data-action="appeal">'+icon('retry')+'<span>申请再审</span></button>'+
+        '<button class="btn btn--ghost" data-action="archive">'+icon('archive')+'<span>存入卷宗</span></button>'+
+      '</div>'+
+      '</div>';
+    }
+
+    /* ---------- archive ---------- */
+    function archive(){
+      const all=state.history;
+      const guilty=all.filter(function(x){return outcomeOf(x)==='guilty'}).length;
+      const settle=all.length-guilty;
+      const list=state.archiveTab==='guilty'?all.filter(function(x){return outcomeOf(x)==='guilty'}):state.archiveTab==='settle'?all.filter(function(x){return outcomeOf(x)!=='guilty'}):all;
+      const tabs=[{id:'all',label:'全部',n:all.length},{id:'guilty',label:'有罪',n:guilty},{id:'settle',label:'和解',n:settle}];
+      return '<div class="fade-in">'+crumb('返回审判庭','home','Personal Archive · 卷宗室')+
+        '<div class="screen" style="padding-bottom:0"><span class="band"><img src="'+sceneAssets.archive+'" alt="复古木刻风格的档案室"><span class="band-tag">档案只存在这台设备的浏览器里</span></span>'+
+        '<span class="eyebrow">Your Records</span>'+
+        '<h2 class="display">我的卷宗。</h2>'+
+        '<p class="lede">每一次不爽，都有一份正式记录。卷宗只存在这台设备的浏览器里。</p></div>'+
+        (all.length?'<div class="tabs">'+tabs.map(function(t){
+          return '<button class="'+(state.archiveTab===t.id?'is-on':'')+'" data-action="archive-tab" data-id="'+t.id+'">'+t.label+'<span class="n">'+t.n+'</span></button>';
+        }).join('')+'</div>':'')+
+        (list.length?'<div class="rec-list">'+list.map(function(x){
+          const portrait=x.defendantId&&defendantAssets[x.defendantId]?defendantAssets[x.defendantId]:propAssets.scroll;
+          return '<article class="rec">'+
+            art(portrait,'',x.target)+
+            '<button class="rec-body" data-action="open-verdict" data-id="'+esc(x.id)+'">'+
+              '<span class="rec-top"><strong>'+esc(x.target||'未命名案件')+'</strong><time>'+esc(shortDate(x.date))+'</time></span>'+
+              '<span class="rec-charge">'+esc(x.charge||'')+'</span>'+
+              '<span class="sentence">'+esc(x.sentence||'待宣判')+'</span>'+
+              '<span class="rec-foot">'+outcomeBadge(x)+
+                (x.appealRound?'<span class="badge badge--plain">再审 '+x.appealRound+'</span>':'')+
+                (x.reaction?'<span class="badge badge--gold">'+(x.reaction==='fair'?'判得刚好':x.reaction==='light'?'判得太轻':'判得太重')+'</span>':'')+
+                '<span class="open">查看判决'+icon('arrow')+'</span></span>'+
+            '</button>'+
+            '<button class="rec-del" data-action="delete" data-id="'+esc(x.id)+'" aria-label="删除 '+esc(x.target||'案件')+' 的卷宗">'+icon('trash')+'</button>'+
+          '</article>';
+        }).join('')+'</div>':
+        '<div class="empty"><span class="art art--cut art--paper"><img src="'+characterAssets.hamster+'" alt="仓鼠档案管理员"></span>'+
+          '<strong>'+(all.length?'这个分类下还没有卷宗':'档案室还是空的')+'</strong>'+
+          '<p>'+(all.length?'换一个筛选条件看看，或者去开一庭新的。':'第一份判决书还没诞生。带一件生活小事来，本庭给你一份正式记录。')+'</p>'+
+          '<button class="btn btn--solid" data-action="trial">开始第一次审判'+icon('arrow')+'</button></div>')+
+        '</div>';
+    }
+    function shortDate(d){
+      if(!d)return '';
+      const parts=String(d).split('/');
+      if(parts.length===3)return parts[1].padStart(2,'0')+'-'+parts[2].padStart(2,'0');
+      return d;
+    }
+
+    /* ---------- gallery ---------- */
+    function gallery(){
+      const tabs=[{id:'cases',label:'案件被告'},{id:'characters',label:'法庭角色'},{id:'props',label:'法庭物件'},{id:'scenes',label:'场景陈列'}];
+      const nav='<div class="tabs">'+tabs.map(function(t){return '<button class="'+(state.galleryTab===t.id?'is-on':'')+'" data-action="gallery-tab" data-id="'+t.id+'">'+t.label+'</button>'}).join('')+'</div>';
+      const head='<div class="fade-in">'+crumb('返回审判庭','home','Court Collection · 图鉴')+
+        '<div class="ribbon"><img src="'+decor.section+'" alt=""><span>法庭图鉴</span></div>'+
+        '<div class="g-intro"><div><span class="eyebrow">The Court Collection</span><h2 class="display">本庭图鉴。</h2>'+
+        '<p class="lede">人物、物证与案件都已收录在册，共 52 件手绘素材。</p></div>'+
+        '<img src="'+characterAssets.hamster+'" alt="仓鼠档案管理员"></div>'+nav+'</div>';
+      if(state.galleryTab==='characters'){
+        return head+'<div class="g-grid" style="margin-top:12px">'+courtCharacters.map(function(p,i){
+          return '<article class="g-card"><span class="art art--cut art--paper art--tall"><img loading="lazy" src="'+p.image+'" alt="'+esc(p.name)+'"></span>'+
+            '<div class="meta"><small>Personnel · '+String(i+1).padStart(2,'0')+'</small><strong>'+esc(p.name)+'</strong><span>'+esc(p.role)+'</span></div></article>';
+        }).join('')+'</div>'+tail();
+      }
+      if(state.galleryTab==='props'){
+        return head+'<div class="g-grid" style="margin-top:12px">'+courtProps.map(function(p,i){
+          return '<article class="g-card"><span class="art art--cut"><img loading="lazy" src="'+p.image+'" alt="'+esc(p.name)+'"></span>'+
+            '<div class="meta"><small>Exhibit · '+String(i+1).padStart(2,'0')+'</small><strong>'+esc(p.name)+'</strong><span>'+esc(p.desc)+'</span></div></article>';
+        }).join('')+'</div>'+tail();
+      }
+      if(state.galleryTab==='scenes'){
+        return head+'<div class="g-grid g-grid--wide" style="margin-top:12px">'+courtScenes.map(function(s,i){
+          return '<article class="g-card g-card--wide"><span class="art"><img loading="lazy" src="'+s.image+'" alt="'+esc(s.name)+'"></span>'+
+            '<div class="meta"><small>Location · '+String(i+1).padStart(2,'0')+'</small><strong>'+esc(s.name)+'</strong><span>'+esc(s.desc)+'</span></div></article>';
+        }).join('')+'</div>'+tail();
+      }
+      const q=(state.query||'').trim().toLowerCase();
+      const list=defendants.filter(function(d){
+        if(state.category!=='all'&&d.category!==state.category)return false;
+        if(!q)return true;
+        return (d.title+' '+d.subtitle).toLowerCase().includes(q);
+      });
+      return head+
+        '<label class="searchbar" style="margin-top:12px">'+icon('loupe')+
+          '<input id="gallery-search" type="search" autocomplete="off" placeholder="搜一搜被告名称" value="'+esc(state.query||'')+'">'+
+          (state.query?'<button class="clear" data-action="clear-query" aria-label="清空搜索">'+icon('close')+'</button>':'<span aria-hidden="true"></span>')+
+        '</label>'+
+        '<div class="chips" style="margin:12px var(--gutter) 0"><button class="chip'+(state.category==='all'?' is-on':'')+'" data-action="filter" data-id="all">全部</button>'+
+          categories.map(function(c){return '<button class="chip'+(state.category===c.id?' is-on':'')+'" data-action="filter" data-id="'+c.id+'">'+esc(c.label)+'</button>'}).join('')+'</div>'+
+        (list.length?'<div class="g-grid" style="margin-bottom:8px">'+list.map(function(d){
+          return '<article class="g-card"><button class="g-open" data-action="select-case" data-id="'+d.id+'" aria-label="起诉 '+esc(d.title)+'">'+art(d.image,'',d.title)+'</button>'+
+            '<div class="meta"><small>'+esc(catName(d.category))+'</small><strong>'+esc(d.title)+'</strong><span>'+esc(d.subtitle)+'</span></div>'+
+            '<button class="chip" data-action="select-case" data-id="'+d.id+'">起诉'+icon('plus')+'</button></article>';
+        }).join('')+'</div>':
+        '<div class="empty"><strong>图鉴里没有这位</strong><p>换个关键词，或者去立案时把它写成自定义被告。</p></div>')+tail();
+    }
+    function tail(){
+      return '<div class="colophon"><span>Hand-drawn woodcut set</span><span>52 assets</span><span>Local only</span></div>';
+    }
+
+    /* ---------- render ---------- */
+    function render(options){
+      options=options||{};
+      const active=state.page==='archive'?'archive':state.page==='gallery'?'gallery':(state.page==='trial'||state.page==='processing')?'trial':'home';
+      document.querySelectorAll('.tab-bar .tab').forEach(function(b){
+        const on=b.dataset.tab===active;
+        b.classList.toggle('is-on',on);
+        if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+      });
+      app.innerHTML=state.page==='trial'?trial():state.page==='result'?verdict():state.page==='processing'?processing():state.page==='archive'?archive():state.page==='gallery'?gallery():home();
+      syncHash();
+      if(options.focusId){
+        const focused=document.getElementById(options.focusId);
+        if(focused){focused.focus();if(typeof options.selectionStart==='number'&&typeof focused.setSelectionRange==='function'){try{focused.setSelectionRange(options.selectionStart,options.selectionEnd)}catch(error){}}}
+      }
+      if(options.scroll!==false&&!options.focusId)window.scrollTo({top:0,behavior:'auto'});
+    }
+
+    let deliberationToken=0;
+    function openDeliberation(){
+      const token=++deliberationToken;
+      state.page='processing';delibStage=0;render();
+      if(delibTimer)clearInterval(delibTimer);
+      delibTimer=setInterval(advanceDelib,620);
+      window.setTimeout(function(){if(token===deliberationToken&&state.page==='processing')makeVerdict()},620*delibSteps.length+900);
+    }
+
+    function makeVerdict(){
       if(state.page!=='processing')return;
+      if(delibTimer){clearInterval(delibTimer);delibTimer=null}
       const style=judgeStyles.find(function(x){return x.id===state.judge})||judgeStyles[0];
       const target=state.target,category=target?target.category:'custom';
-      const sentence=pickOne(verdictSentences[category]||verdictSentences.custom);
+      const evidenceCount=state.evidence.length;
+      const outcome=(evidenceCount>=2||style.id==='strict')?'guilty':'settle';
+      const sentence=outcome==='guilty'?pickOne(verdictSentences[category]||verdictSentences.custom):pickOne(settleSentences[style.id]||settleSentences.strict);
+      const penalty=outcome==='guilty'?pickOne(penaltiesByJudge[style.id]||penaltiesByJudge.strict):pickOne(settlePenalties[style.id]||settlePenalties.strict);
       const daily=state.caseMode==='daily'?getDailyDocket():null;
+      const comment=outcome==='guilty'?pickOne(judgeComments[style.id]||judgeComments.strict):pickOne(settleComments[style.id]||settleComments.strict);
       const item={
         id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
         date:new Date().toLocaleDateString('zh-CN'),
         docket:'（'+new Date().getFullYear()+'）万审字第'+String(Math.floor(Math.random()*8999)+1000)+'号',
         target:target?target.title:state.custom,defendantId:target?target.id:null,category:category,
         mark:target?target.mark:'诉',charge:state.charge,evidence:state.evidence.slice(0,2),
+        outcome:outcome,
         finding:target&&caseFindings[target.id]?caseFindings[target.id]:'争议焦点：这件事是否已经超出当事人的合理忍耐范围。',
-        sentence:sentence,penalty:pickOne(penaltiesByJudge[style.id]||penaltiesByJudge.strict),
-        judge:style.name,judgeComment:pickOne(judgeComments[style.id]||judgeComments.strict)+(state.evidence.length>1?' 本案提交两项证据，依法从重考虑。':' 本庭已记录当事人的第一项证据。'),
+        sentence:sentence,penalty:penalty,
+        judge:style.name,
+        judgeComment:comment+(evidenceCount>1?' 本案提交两项证据，依法从重考虑。':' 本庭已记录当事人的第一项证据。'),
         source:state.caseMode||'manual',dailyDate:daily?daily.dateKey:null,appealOf:state.appealOf||null,
         appealRound:state.appealOf?(state.appealRound||1):0,reaction:''
       };
       state.result=item;state.history=[item].concat(state.history.filter(function(x){return x.id!==item.id})).slice(0,80);
       save();state.appealOf=null;state.appealRound=0;state.caseMode='manual';state.page='result';render();
     }
-function verdict(item){
-      const v=item||state.result;if(!v)return '';
-      const appealLabel=v.appealRound?'第 '+(v.appealRound+1)+' 次审理':'初审判决';
-      const caseType=v.source==='daily'?'每日专属案件':v.source==='quick'?'随机速审':v.source==='appeal'?'再审案件':'正式立案';
-      const reactions=[{id:'fair',label:'判得刚好',mark:'✓'},{id:'light',label:'判得太轻',mark:'＋'},{id:'heavy',label:'判得太重',mark:'－'}];
-      return '<div class="result-heading"><span class="seal">宣</span><span class="kicker">THE VERDICT IS IN / '+caseType.toUpperCase()+' · '+appealLabel+'</span><h1>'+(v.appealRound?'再审结束。':'审判结束。')+'<em>判决如下。</em></h1><p>'+(v.appealRound?'本庭已重新听取证据，作出新的裁定。':'本庭已完成审理，卷宗已归档。现在轮到你来看看判得合不合理。')+'</p></div><div class="result-layout"><article class="verdict"><div class="verdict-top"><span>COURT OF EVERY LITTLE THING</span><span>'+esc(v.docket)+'</span></div><div class="verdict-title"><strong>万物审判庭</strong><small>娱乐法庭 · 刑事判决书</small></div><div class="verdict-line"><label>被告</label><div><strong>'+esc(v.target)+'</strong><p>'+esc(v.category?catName(v.category):'自定义案件')+' · '+caseType+'</p></div></div><div class="verdict-line"><label>罪名</label><div><strong>'+esc(v.charge)+'</strong><p>经本庭审理，相关行为已造成持续性精神损耗。</p></div></div><div class="verdict-finding"><small>本案争议焦点</small><p>'+esc(v.finding||'本庭已完成对相关行为的审理。')+'</p></div><div class="verdict-line"><label>证据</label><div>'+((v.evidence||[]).map(function(e,i){return '<p>'+(i+1)+'. '+esc(e)+'</p>'}).join('')||'<p>当事人陈述已记录在案。</p>')+'</div></div><div class="sentence-box"><small>本庭判决如下</small><strong>'+esc(v.sentence)+'</strong><p style="font-size:10px;margin:0;color:#7e7060">附加处罚：'+esc(v.penalty)+'</p></div><div class="judge-comment"><div><small>审判官 · '+esc(v.judge)+'</small><p>'+esc(v.judgeComment)+'</p></div><span class="stamp">审判<br>生效</span></div><div class="verdict-top" style="margin-top:20px"><span>'+esc(v.date)+'</span><span>纯属娱乐 · 不具法律效力</span></div></article><aside class="result-side"><div class="side-card"><span class="kicker">SHARE THE VERDICT</span><h3>把判决晒出去</h3><p>先预览海报。手机内置浏览器可长按图片保存；支持系统分享时，也可以直接分享原图。</p><button class="button primary" data-action="poster">生成判决海报　↗</button><button class="button secondary" style="width:100%;color:var(--ink);border-color:#cdbca5" data-action="copy">▣　复制小红书文案</button></div><div class="side-card"><h3>你觉得这份判决合理吗？</h3><p>选一个态度，留在这份本地卷宗里。</p><div class="reaction-grid">'+reactions.map(function(r){return '<button class="reaction-option '+(v.reaction===r.id?'selected':'')+'" data-action="reaction" data-id="'+r.id+'" aria-pressed="'+(v.reaction===r.id?'true':'false')+'"><b>'+r.mark+'</b><span>'+r.label+'</span></button>'}).join('')+'</div><small class="local-note">仅保存在当前设备，不会上传。</small></div><div class="side-card"><h3>不服？申请再审。</h3><p>保留原指控和已提交证据，再听一次合议庭意见。</p><button class="button primary" data-action="appeal">申请再审　↻</button><button class="button secondary" style="width:100%;color:var(--ink);border-color:#cdbca5" data-action="archive">查看我的卷宗　→</button></div></aside></div>';
-    }
-function archive(){
-      return '<section class="page"><div class="page-top"><button class="back" data-action="home">← 返回首页</button><span>卷宗室 / PERSONAL ARCHIVE</span></div><div class="archive-banner"><img class="archive-room-art" src="'+sceneAssets.archive+'" alt="复古木刻风格档案室"><div class="archive-banner-copy"><span class="kicker">YOUR COURT RECORDS / 档案室</span><h2>我的卷宗室。</h2><p>每一次不爽，都有一份正式记录。</p><small>'+state.history.length+' 份判决已经归档</small></div><img class="archive-mascot" src="'+characterAssets.hamster+'" alt="仓鼠档案管理员"></div>'+(state.history.length?'<div class="archive-list">'+state.history.map(function(x){const portrait=x.defendantId&&defendantAssets[x.defendantId]?defendantAssets[x.defendantId]:characterAssets.rabbit;return '<article class="archive-item"><img class="archive-case-image" src="'+portrait+'" alt=""><div class="archive-item-copy"><strong>'+esc(x.target||'未命名案件')+'</strong><small>'+esc(x.docket||'卷宗编号待补')+' · '+esc(x.sentence||'待宣判')+'</small><span>'+(x.appealRound?'再审 · 第 '+(x.appealRound+1)+' 次':'初审')+' · '+esc(x.date||'')+'</span></div><button data-action="open-verdict" data-id="'+esc(x.id)+'">查看判决 →</button><button data-action="delete" data-id="'+esc(x.id)+'" aria-label="删除 '+esc(x.target||'案件')+'">删除</button></article>'}).join('')+'</div>':'<div class="empty"><strong>这里暂时没有卷宗</strong><p>第一份判决书还没诞生。去审判庭带一个案件回来吧。</p><button class="button primary" data-action="trial">开始第一次审判　→</button></div>')+'</section>';
-    }
-function gallery(){const tabs='<div class="gallery-tabs"><button class="chip '+(state.galleryTab==='cases'?'active':'')+'" data-action="gallery-tab" data-id="cases">案件被告</button><button class="chip '+(state.galleryTab==='characters'?'active':'')+'" data-action="gallery-tab" data-id="characters">法庭角色</button><button class="chip '+(state.galleryTab==='props'?'active':'')+'" data-action="gallery-tab" data-id="props">法庭物件</button><button class="chip '+(state.galleryTab==='scenes'?'active':'')+'" data-action="gallery-tab" data-id="scenes">场景陈列</button></div>';const intro='<div class="gallery-intro"><div><span class="kicker">THE COURT COLLECTION</span><h2>本庭图鉴。</h2><p>人物、物证与案件都已收录在册。</p></div><img src="'+characterAssets.hamster+'" alt="仓鼠档案管理员"></div>';if(state.galleryTab==='props'){return '<section class="page"><div class="page-top"><button class="back" data-action="home">← 返回首页</button><span>COURT OBJECTS / 法庭物件</span></div>'+intro+tabs+'<div class="prop-grid">'+courtProps.map((p,i)=>'<article class="prop-card"><div class="prop-illustration"><img loading="lazy" src="'+p.image+'" alt="'+p.name+'"></div><div class="prop-copy"><small>EXHIBIT · '+String(i+1).padStart(2,'0')+'</small><strong>'+p.name+'</strong><span>'+p.desc+'</span></div></article>').join('')+'</div></section>'}if(state.galleryTab==='characters'){return '<section class="page"><div class="page-top"><button class="back" data-action="home">← 返回首页</button><span>COURT PEOPLE / 法庭角色</span></div>'+intro+tabs+'<div class="character-grid">'+courtCharacters.map((p,i)=>'<article class="character-card"><div class="character-illustration"><img loading="lazy" src="'+p.image+'" alt="'+p.name+'"></div><div class="character-copy"><small>PERSONNEL · '+String(i+1).padStart(2,'0')+'</small><strong>'+p.name+'</strong><span>'+p.role+'</span></div></article>').join('')+'</div></section>'}if(state.galleryTab==='scenes'){return '<section class="page"><div class="page-top"><button class="back" data-action="home">← 返回首页</button><span>COURT LOCATIONS / 场景陈列</span></div>'+intro+tabs+'<div class="scene-grid">'+courtScenes.map((s,i)=>'<article class="scene-card"><img loading="lazy" src="'+s.image+'" alt="'+s.name+'"><div><small>LOCATION · '+String(i+1).padStart(2,'0')+'</small><strong>'+s.name+'</strong><span>'+s.desc+'</span></div></article>').join('')+'</div></section>'}const filtered=defendants.filter(d=>(state.category==='all'||d.category===state.category)&&(!state.query||(d.title+d.subtitle).includes(state.query)));return '<section class="page"><div class="page-top"><button class="back" data-action="home">← 返回首页</button><span>CASE ENCYCLOPEDIA / 案件图鉴</span></div>'+intro+tabs+'<label class="case-search"><span>⌕</span><input id="gallery-search" type="search" placeholder="搜一搜被告名称" value="'+esc(state.query||'')+'"></label><div class="filter-row"><button class="chip '+(state.category==='all'?'active':'')+'" data-action="filter" data-id="all">全部</button>'+categories.map(c=>'<button class="chip '+(state.category===c.id?'active':'')+'" data-action="filter" data-id="'+c.id+'">'+c.label+'</button>').join('')+'</div><div class="gallery-list">'+filtered.map(d=>'<button class="gallery-case" data-action="select-case" data-id="'+d.id+'"><img src="'+d.image+'" alt=""><span><strong>'+esc(d.title)+'</strong><small>'+esc(d.subtitle)+'</small><i>'+esc(catName(d.category))+'</i></span><b>＋</b></button>').join('')+'</div>'+(filtered.length?'':'<div class="empty"><strong>暂时没有找到这个被告</strong><p>换个关键词，或者自己把它写进诉状。</p></div>')+'</section>'}
-    function processing(){return '<section class="page"><div class="deliberation"><div class="deliberation-art"><img src="'+sceneAssets.deliberation+'" alt="法庭正在合议"><span>合议庭 · 正在评议</span></div><div class="deliberation-paper"><div class="deliberation-staff"><img src="'+characterAssets.hedgehog+'" alt="刺猬执法官"><img src="'+characterAssets.frog+'" alt="青蛙书记员"><span>执法官与书记员正在核对卷宗</span></div><span class="kicker">THE COURT IS IN SESSION</span><h2>正在形成判决。</h2><p>书记员正在核对证据，法官正在讨论处罚方式。</p><div class="process-step"><b>✓</b><span>核查案件材料</span></div><div class="process-step"><b>✓</b><span>听取双方陈述</span></div><div class="process-step active"><b>…</b><span>合议庭裁决中</span></div><div class="process-footer"><img src="'+propAssets.hourglass+'" alt="沙漏" loading="lazy"><div class="process-bar"><i></i></div></div></div></div></section>'}
-    function render(options){
-      options=options||{};
-      const active=state.page==='archive'?'archive':state.page==='gallery'?'gallery':state.page==='trial'?'trial':'home';
-      navActive(active);
-      app.innerHTML=state.page==='trial'?trial():state.page==='result'?'<section class="page">'+verdict()+'</section>':state.page==='processing'?processing():state.page==='archive'?archive():state.page==='gallery'?gallery():home();
-      if(options.focusId){
-        const focused=document.getElementById(options.focusId);
-        if(focused){focused.focus();if(typeof options.selectionStart==='number'&&typeof focused.setSelectionRange==='function'){try{focused.setSelectionRange(options.selectionStart,options.selectionEnd)}catch(error){}}}
-      }
-      if(options.scroll!==false&&!options.focusId)window.scrollTo({top:0,behavior:'smooth'});
-    }
-    let deliberationToken=0;
-    function openDeliberation(){
-      const token=++deliberationToken;state.page='processing';render();
-      window.setTimeout(function(){if(token===deliberationToken&&state.page==='processing')makeVerdict()},1100);
-    }
+
     function pickRandom(mode){
       const kind=mode||'quick',daily=kind==='daily'?getDailyDocket():null;
       const defendant=daily?daily.defendant:defendants[Math.floor(Math.random()*defendants.length)];
@@ -208,6 +640,7 @@ function gallery(){const tabs='<div class="gallery-tabs"><button class="chip '+(
       state.evidence=Array.isArray(previous.evidence)?previous.evidence.slice(0,2):[];
       state.judge=state.judge||'strict';state.appealOf=previous.id;state.appealRound=(previous.appealRound||0)+1;state.caseMode='appeal';
       state.result=null;state.page='trial';state.step=3;render();
+      showToast('再审已受理：原被告、罪名与证据均已保留');
     }
     function recordReaction(reaction){
       if(!state.result||!['fair','light','heavy'].includes(reaction))return;
@@ -217,94 +650,221 @@ function gallery(){const tabs='<div class="gallery-tabs"><button class="chip '+(
       showToast(reaction==='fair'?'已记录：判得刚好':reaction==='light'?'已记录：判得太轻':'已记录：判得太重');
     }
 
-async function poster(){
+    /* ---------- poster ---------- */
+    function loadImage(src){
+      return new Promise(function(resolve,reject){
+        const image=new Image();
+        image.onload=function(){resolve(image)};
+        image.onerror=function(){reject(new Error('asset failed: '+src))};
+        image.src=src;
+      });
+    }
+    async function poster(){
       if(!state.result)return;
       const v=state.result;
-      const canvas=document.createElement('canvas');
-      canvas.width=1080;canvas.height=1440;
+      const W=1080,H=1440,L=84,R=996,CW=R-L;
+      const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
       const g=canvas.getContext('2d');
-      const paper=g.createLinearGradient(0,0,1080,1440);
-      paper.addColorStop(0,'#fbf3e5');paper.addColorStop(1,'#eee0c8');
-      g.fillStyle=paper;g.fillRect(0,0,1080,1440);
-      g.strokeStyle='#9f7547';g.lineWidth=5;g.strokeRect(34,34,1012,1372);
-      g.strokeStyle='#d3b98f';g.lineWidth=2;g.strokeRect(52,52,976,1364);
-      g.fillStyle='#8f2f28';g.fillRect(52,52,976,12);
-      g.fillStyle='#c29350';g.fillRect(52,64,976,4);
-      const drawText=(text,x,y,font,color,align)=>{g.font=font;g.fillStyle=color;g.textAlign=align||'left';g.fillText(String(text),x,y)};
-      const wrap=(text,x,y,maxWidth,lineHeight,font,color)=>{
-        g.font=font;g.fillStyle=color;g.textAlign='left';
+      const SERIF='"Songti SC","STSong","Source Han Serif SC","Noto Serif CJK SC",serif';
+      const SANS='"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+
+      const paper=g.createLinearGradient(0,0,W,H);
+      paper.addColorStop(0,'#fbf3e3');paper.addColorStop(.55,'#f5e8ce');paper.addColorStop(1,'#eddfbe');
+      g.fillStyle=paper;g.fillRect(0,0,W,H);
+      g.save();g.globalAlpha=.045;g.fillStyle='#5b4433';
+      for(let i=0;i<3000;i++){g.fillRect(Math.random()*W,Math.random()*H,1.6,1.6)}
+      g.restore();
+      g.strokeStyle='#9a6f3c';g.lineWidth=6;g.strokeRect(30,30,W-60,H-60);
+      g.strokeStyle='#cfa96a';g.lineWidth=2;g.strokeRect(46,46,W-92,H-92);
+      g.strokeStyle='rgba(154,111,60,.45)';g.lineWidth=1;g.strokeRect(58,58,W-116,H-116);
+
+      const text=function(str,x,y,font,color,align){g.font=font;g.fillStyle=color;g.textAlign=align||'left';g.textBaseline='alphabetic';g.fillText(String(str),x,y)};
+      const wrap=function(str,x,y,maxWidth,lineHeight,font,color){
+        g.font=font;g.fillStyle=color;g.textAlign='left';g.textBaseline='alphabetic';
         const lines=[];let line='';
-        for(const char of String(text)){
-          const candidate=line+char;
-          if(line&&g.measureText(candidate).width>maxWidth){lines.push(line);line=char}else{line=candidate}
+        for(const ch of String(str)){
+          const cand=line+ch;
+          if(line&&g.measureText(cand).width>maxWidth){lines.push(line);line=ch}else{line=cand}
         }
         if(line)lines.push(line);
-        lines.forEach((item,index)=>g.fillText(item,x,y+index*lineHeight));
+        lines.forEach(function(item,i){g.fillText(item,x,y+i*lineHeight)});
         return y+Math.max(1,lines.length)*lineHeight;
       };
-      const fit=(text,maxWidth,start=42,min=24)=>{
+      const wrapMax=function(str,x,y,maxWidth,lineHeight,maxLines,font,color){
+        g.font=font;g.fillStyle=color;g.textAlign='left';g.textBaseline='alphabetic';
+        const lines=[];let line='';
+        for(const ch of String(str)){
+          const cand=line+ch;
+          if(line&&g.measureText(cand).width>maxWidth){
+            if(lines.length===maxLines-1){
+              let tail=line;
+              while(tail&&g.measureText(tail+'…').width>maxWidth)tail=tail.slice(0,-1);
+              lines.push(tail+'…');line='';
+              return emit(lines,x,y,lineHeight);
+            }
+            lines.push(line);line=ch;
+          }else{line=cand}
+        }
+        if(line)lines.push(line);
+        return emit(lines,x,y,lineHeight);
+      };
+      const emit=function(lines,x,y,lineHeight){
+        lines.forEach(function(item,i){g.fillText(item,x,y+i*lineHeight)});
+        return y+Math.max(1,lines.length)*lineHeight;
+      };
+      const fit=function(str,maxWidth,start,min,weight,face){
         let size=start;
-        while(size>min){g.font='bold '+size+'px serif';if(g.measureText(text).width<=maxWidth)break;size-=2}
-        return 'bold '+size+'px serif';
+        while(size>min){g.font=(weight||'bold')+' '+size+'px '+(face||SERIF);if(g.measureText(str).width<=maxWidth)break;size-=2}
+        return (weight||'bold')+' '+size+'px '+(face||SERIF);
       };
-      try{
-        const hero=await new Promise((resolve,reject)=>{
-          const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=''+sceneAssets.hero+'';
+      const round=function(x,y,w,h,r){
+        g.beginPath();
+        g.moveTo(x+r,y);g.lineTo(x+w-r,y);g.quadraticCurveTo(x+w,y,x+w,y+r);
+        g.lineTo(x+w,y+h-r);g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+        g.lineTo(x+r,y+h);g.quadraticCurveTo(x,y+h,x,y+h-r);
+        g.lineTo(x,y+r);g.quadraticCurveTo(x,y,x+r,y);g.closePath();
+      };
+      const window2=function(x,y,w,h,src,label){
+        g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+        return new Promise(function(resolve){
+          if(!src){g.fillStyle='#e2cfa9';g.fillRect(x,y,w,h);g.restore();resolve();return}
+          const img=new Image();
+          img.onload=function(){
+            const s=Math.max(w/img.width,h/img.height);
+            g.drawImage(img,x+(w-img.width*s)/2,y+(h-img.height*s)/2,img.width*s,img.height*s);
+            g.restore();frameWindow(x,y,w,h,label);resolve();
+          };
+          img.onerror=function(){g.fillStyle='#e2cfa9';g.fillRect(x,y,w,h);g.restore();frameWindow(x,y,w,h,label);resolve()};
+          img.src=src;
         });
-        g.save();
-        g.beginPath();g.rect(84,90,912,300);g.clip();
-        const scale=Math.max(912/hero.width,300/hero.height);
-        const width=hero.width*scale,height=hero.height*scale;
-        g.drawImage(hero,(1080-width)/2,(300-height)/2+90,width,height);
-        g.restore();
-        g.fillStyle='rgba(43,25,19,.22)';g.fillRect(84,90,912,300);
-        g.strokeStyle='#c49a60';g.lineWidth=4;g.strokeRect(84,90,912,300);
-      }catch(error){
-        g.fillStyle='#382721';g.fillRect(84,90,912,300);
-        drawText('万物审判庭',540,245,'bold 68px serif','#f5e5cb','center');
-      }
-      drawText('THE COURT OF EVERY LITTLE THING',540,440,'24px Georgia','#98764d','center');
-      drawText('万物审判庭',540,510,'bold 58px serif','#34251e','center');
-      drawText('娱乐法庭 · 刑事判决书',540,558,'30px serif','#8f3028','center');
-      g.strokeStyle='#c4a77c';g.lineWidth=2;g.beginPath();g.moveTo(130,590);g.lineTo(950,590);g.stroke();
-      const row=(label,value,y,font='30px serif')=>{
-        drawText(label,145,y,'25px sans-serif','#98764f','left');
-        wrap(value,300,y,630,38,font,'#3b2b21');
       };
-      row('案　号',v.docket,650,'26px sans-serif');
-      row('被　告',v.target,710,fit(v.target,630,40,28));
-      row('罪　名',v.charge,775,fit(v.charge,630,34,25));
-      drawText('主要证据',145,858,'25px sans-serif','#98764f','left');
-      let evidenceY=858;
-      v.evidence.forEach((item,index)=>{
-        evidenceY=wrap((index+1)+'. '+item,300,evidenceY,630,35,'23px sans-serif','#514236');
-      });
-      const panelY=Math.max(970,Math.min(1080,evidenceY+22));
-      g.fillStyle='#92342c';g.fillRect(115,panelY,850,190);
-      g.strokeStyle='#d5af71';g.lineWidth=3;g.strokeRect(127,panelY+12,826,166);
-      drawText('本 庭 判 决 如 下',540,panelY+54,'25px serif','#f8e9d2','center');
-      drawText(v.sentence,540,panelY+124,fit(v.sentence,760,56,34),'#fff0d9','center');
-      wrap('附加处罚：'+v.penalty,190,panelY+160,700,27,'20px sans-serif','#f1d7b2');
-      const footY=panelY+238;
-      drawText('审判官 · '+v.judge,145,footY,'23px serif','#76583a','left');
-      wrap(v.judgeComment,145,footY+42,640,31,'21px serif','#4b3c2e');
-      g.save();g.translate(864,footY+34);g.rotate(-.12);
-      g.strokeStyle='#a6382f';g.lineWidth=5;g.strokeRect(-66,-66,132,132);
-      g.strokeStyle='#a6382f';g.lineWidth=2;g.strokeRect(-57,-57,114,114);
-      drawText('审',0,-3,'bold 58px serif','#a6382f','center');
-      drawText('判 决 生 效',0,35,'15px serif','#a6382f','center');
-      g.restore();
-      g.strokeStyle='#c4a77c';g.beginPath();g.moveTo(130,1352);g.lineTo(950,1352);g.stroke();
-      drawText(v.date+'  ·  纯属娱乐，不具法律效力',540,1380,'19px sans-serif','#907958','center');
-      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
-      if(!blob){showToast('图片生成失败，请重试');return}
+      const frameWindow=function(x,y,w,h,label){
+        const veil=g.createLinearGradient(0,y,0,y+h);
+        veil.addColorStop(0,'rgba(36,24,17,.12)');veil.addColorStop(1,'rgba(36,24,17,.42)');
+        g.fillStyle=veil;g.fillRect(x,y,w,h);
+        g.strokeStyle='#c49a60';g.lineWidth=3;g.strokeRect(x,y,w,h);
+        g.strokeStyle='rgba(246,224,184,.35)';g.lineWidth=1;g.strokeRect(x+6,y+6,w-12,h-12);
+        if(label){g.fillStyle='rgba(36,24,17,.6)';g.fillRect(x,y+h-38,w,38);text(label,x+16,y+h-13,'18px '+SANS,'#f0dcb2')}
+      };
+
+      /* 1. crest plate */
+      const plateY=78,plateH=196;
+      const plateGrad=g.createLinearGradient(0,plateY,0,plateY+plateH);
+      plateGrad.addColorStop(0,'#a8392c');plateGrad.addColorStop(1,'#6f1d18');
+      round(L,plateY,CW,plateH,10);g.fillStyle=plateGrad;g.fill();
+      g.strokeStyle='#d3ac61';g.lineWidth=2;round(L+9,plateY+9,CW-18,plateH-18,7);g.stroke();
+      g.strokeStyle='rgba(246,224,184,.28)';g.lineWidth=1;round(L+16,plateY+16,CW-32,plateH-32,5);g.stroke();
+      const cx=W/2;
+      text('万物审判庭',cx,plateY+88,'bold 50px '+SERIF,'#f8e9cd','center');
+      text('THE COURT OF EVERY LITTLE THING',cx,plateY+120,'15px '+SANS,'#d9bd8d','center');
+      g.strokeStyle='rgba(211,172,97,.5)';g.lineWidth=1;
+      g.beginPath();g.moveTo(cx-150,plateY+140);g.lineTo(cx+150,plateY+140);g.stroke();
+      text(outcomeOf(v)==='guilty'?'娱乐法庭 · 刑事判决书':'娱乐法庭 · 和解书',cx,plateY+172,'25px '+SERIF,'#f0dcb2','center');
+
+      /* 2. scene + defendant windows */
+      const bandY=plateY+plateH+24,bandH=240,artW=Math.round(CW*0.655),gap=18;
+      await window2(L,bandY,artW,bandH,sceneAssets.hero,'主审判庭');
+      await window2(L+artW+gap,bandY,CW-artW-gap,bandH,v.defendantId?defendantAssets[v.defendantId]:propAssets.scroll,'被 告');
+
+      /* 3. docket */
+      let y=bandY+bandH+48;
+      text('案号  '+v.docket+'      日期  '+v.date,cx,y,'22px '+SANS,'#8a6f4e','center');
+      y+=26;
+      g.strokeStyle='#c4a77c';g.lineWidth=1.5;g.beginPath();g.moveTo(L,y);g.lineTo(R,y);g.stroke();
+
+      /* 4. case rows */
+      y+=62;
+      const labelX=L+26,valueX=L+136,valueW=R-valueX-26;
+      const row=function(label,value,font){
+        text(label,labelX,y,'22px '+SANS,'#98764f');
+        y=wrapMax(value,valueX,y,valueW,36,1,font,'#33241b')+30;
+      };
+      row('被 告',v.target,fit(v.target,valueW,38,26,'600'));
+      row('罪 名',v.charge,fit(v.charge,valueW,32,23,'600'));
+      row('焦 点',(v.finding||'').replace(/^争议焦点[：:]/,''),'24px '+SERIF);
+      text('证 据',labelX,y,'22px '+SANS,'#98764f');
+      const ev=(v.evidence&&v.evidence.length)?v.evidence:['当事人陈述已记录在案。'];
+      y=wrapMax(ev.map(function(e,i){return (i+1)+'. '+e}).join('   '),valueX,y,valueW,32,3,'21px '+SANS,'#514236')+30;
+
+      /* 5. verdict plaque */
+      const settle=outcomeOf(v)!=='guilty';
+      const plaqueY=Math.min(y,H-430),plaqueH=186;
+      const pg=g.createLinearGradient(0,plaqueY,0,plaqueY+plaqueH);
+      pg.addColorStop(0,settle?'#5d7355':'#a8392c');pg.addColorStop(1,settle?'#3b4f36':'#6f1d18');
+      round(L,plaqueY,CW,plaqueH,10);g.fillStyle=pg;g.fill();
+      g.strokeStyle='rgba(246,224,184,.5)';g.lineWidth=2;round(L+9,plaqueY+9,CW-18,plaqueH-18,7);g.stroke();
+      text(settle?'和 解 条 件':'本 庭 判 决 如 下',cx,plaqueY+44,'22px '+SERIF,'#f8e9d2','center');
+      g.font=fit(v.sentence,CW-90,44,26);g.fillStyle='#fff0d9';g.textAlign='center';
+      g.fillText(v.sentence,cx,plaqueY+102);
+      wrapMax((settle?'和解条件：':'附加处罚：')+v.penalty,L+40,plaqueY+146,CW-80,26,2,'20px '+SANS,'#f1d7b2');
+
+      /* 6. judge comment + wax seal */
+      const footY=plaqueY+plaqueH+52;
+      text('审判官 · '+v.judge,L+26,footY,'23px '+SERIF,'#76583a');
+      wrapMax(v.judgeComment,L+26,footY+40,CW-270,30,3,'21px '+SERIF,'#463627');
+      try{
+        const seal=await new Promise(function(res,rej){const i=new Image();i.onload=function(){res(i)};i.onerror=rej;i.src=propAssets.seal});
+        g.save();g.translate(R-92,footY+66);g.rotate(-.16);
+        const ss=140/seal.width;g.drawImage(seal,-75,-75,seal.width*ss,seal.height*ss);g.restore();
+      }catch(error){
+        g.save();g.translate(R-96,footY+72);g.rotate(-.16);
+        g.strokeStyle='#a6382f';g.lineWidth=4;g.beginPath();g.arc(0,0,62,0,Math.PI*2);g.stroke();
+        text('审',0,18,'bold 52px '+SERIF,'#a6382f','center');g.restore();
+      }
+
+      /* 7. footer */
+      g.strokeStyle='#c4a77c';g.lineWidth=1;g.beginPath();g.moveTo(L,H-96);g.lineTo(R,H-96);g.stroke();
+      text('纯属娱乐，不具法律效力  ·  Court of Every Little Thing',cx,H-60,'19px '+SANS,'#907958','center');
+
+      let blob=null;
+      try{blob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/png')})}catch(error){blob=null}
+      if(!blob){showToast('图片生成失败，已改用下载方式');try{downloadCanvas(canvas,v)}catch(e){}return}
       if(state.posterUrl)URL.revokeObjectURL(state.posterUrl);
       state.posterBlob=blob;state.posterUrl=URL.createObjectURL(blob);
       state.posterFilename='万物审判庭-'+String(v.docket||'判决书').replace(/[（）()\s]/g,'')+'.png';
-      const modal=document.createElement('section');
-      modal.className='poster-preview';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','判决海报预览');
-      modal.innerHTML='<div class="poster-dialog"><div class="poster-dialog-head"><div><small>SHAREABLE COURT RECORD</small><strong>判决海报已就绪</strong></div><button class="poster-close" data-action="poster-close" aria-label="关闭预览">×</button></div><div class="poster-image-wrap"><img src="'+state.posterUrl+'" alt="万物审判庭判决海报，可长按保存"></div><p class="poster-hint">在手机里长按图片，选择“保存到相册”。支持系统分享时，也可以直接分享原图。</p><div class="poster-actions"><button class="button primary" data-action="poster-download">下载原图</button><button class="button secondary" data-action="poster-share">系统分享</button></div></div>';
-      app.appendChild(modal);modal.querySelector('.poster-close').focus();
+      openSheet();
+    }
+    function downloadCanvas(canvas,v){
+      const anchor=document.createElement('a');
+      anchor.href=canvas.toDataURL('image/png');
+      anchor.download='万物审判庭-'+String(v.docket||'判决书').replace(/[（）()\s]/g,'')+'.png';
+      document.body.appendChild(anchor);anchor.click();anchor.remove();
+    }
+    function openSheet(){
+      if(!state.posterUrl)return;
+      sheetEl.innerHTML='<div class="sheet-panel" role="dialog" aria-modal="true" aria-label="判决海报预览">'+
+        '<div class="sheet-hd"><h3>判决海报已就绪</h3><button class="x" data-action="poster-close" aria-label="关闭预览">'+icon('close')+'</button></div>'+
+        '<div class="sheet-figure"><img src="'+state.posterUrl+'" alt="3:4 判决海报预览"></div>'+
+        '<p class="sheet-tip">长按图片可保存到相册；也可以直接下载原图或调用系统分享。</p>'+
+        '<div class="sheet-actions">'+
+          '<button class="btn btn--solid" data-action="poster-download">'+icon('download')+'<span>下载原图</span></button>'+
+          '<button class="btn btn--ink" data-action="poster-share">'+icon('share')+'<span>系统分享</span></button>'+
+        '</div>'+
+        '<button class="btn btn--ghost btn--block" data-action="poster-close">返回判决</button>'+
+      '</div>';
+      sheetEl.hidden=false;
+      document.body.style.overflow='hidden';
+      const first=sheetEl.querySelector('.x');if(first)first.focus();
+    }
+    let confirmAction=null;
+    function askConfirm(title,body,onOk){
+      confirmAction=onOk;
+      sheetEl.innerHTML='<div class="sheet-panel" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">'+
+        '<div class="sheet-hd"><h3 id="confirm-title">'+esc(title)+'</h3><button class="x" data-action="confirm-cancel" aria-label="取消">'+icon('close')+'</button></div>'+
+        '<p class="confirm-body">'+body+'</p>'+
+        '<div class="sheet-actions">'+
+          '<button class="btn btn--ghost" data-action="confirm-cancel">取消</button>'+
+          '<button class="btn btn--danger-solid" data-action="confirm-ok">确认删除</button>'+
+        '</div></div>';
+      sheetEl.hidden=false;
+      document.body.style.overflow='hidden';
+      const ok=sheetEl.querySelector('[data-action="confirm-ok"]');if(ok)ok.focus();
+    }
+    function closeSheet(){
+      sheetEl.hidden=true;sheetEl.innerHTML='';
+      document.body.style.overflow='';
+      if(state.posterUrl){URL.revokeObjectURL(state.posterUrl);state.posterUrl=null;state.posterBlob=null}
+      confirmAction=null;
     }
     async function sharePoster(){
       if(!state.posterBlob){showToast('请先生成判决海报');return}
@@ -314,22 +874,27 @@ async function poster(){
       try{await navigator.share({files:[file],title:'我的万物审判庭判决',text:'我把这件生活小事告上了万物审判庭。你觉得判得合理吗？'})}
       catch(error){if(error&&error.name!=='AbortError')showToast('系统分享暂不可用，请长按预览图保存')}
     }
-    function closePosterPreview(){
-      const modal=app.querySelector('.poster-preview');if(modal)modal.remove();
-      if(state.posterUrl){URL.revokeObjectURL(state.posterUrl);state.posterUrl=null}
-    }
     async function copyVerdictText(){
       if(!state.result)return;
       const v=state.result;
-      const content=['我把「'+v.target+'」告上了万物审判庭！','罪名：'+v.charge,'判决：'+v.sentence,'附加处罚：'+v.penalty,'审判官：'+v.judge,'你觉得判得合理吗？','', '#万物审判庭 #生活吐槽 #今日判决'].join('\n');
+      const content=[
+        '我把「'+v.target+'」告上了万物审判庭！',
+        '罪名：'+v.charge,
+        (outcomeOf(v)==='guilty'?'判决：':'和解：')+v.sentence,
+        '审判官：'+v.judge,
+        '你觉得判得合理吗？','',
+        '#万物审判庭 #生活吐槽 #今日判决'
+      ].join('\n');
       try{await navigator.clipboard.writeText(content);showToast('小红书分享文案已复制')}
       catch(error){
         const textarea=document.createElement('textarea');textarea.value=content;textarea.setAttribute('readonly','');textarea.style.position='fixed';textarea.style.opacity='0';document.body.appendChild(textarea);textarea.select();
         const copied=document.execCommand&&document.execCommand('copy');textarea.remove();showToast(copied?'小红书分享文案已复制':'复制失败，请长按选择文案');
       }
     }
+
+    /* ---------- events ---------- */
     app.addEventListener('input',function(e){
-      if(e.target.id==='custom-name'){state.custom=e.target.value;return}
+      if(e.target.id==='custom-name'){state.custom=e.target.value;const c=e.target.parentElement.querySelector('.counter');if(c)c.textContent=e.target.value.length+' / 18';return}
       if(e.target.id==='case-search'||e.target.id==='gallery-search'){
         const id=e.target.id,start=e.target.selectionStart,end=e.target.selectionEnd;
         state.query=e.target.value;render({scroll:false,focusId:id,selectionStart:start,selectionEnd:end});
@@ -337,24 +902,23 @@ async function poster(){
     });
     app.addEventListener('keydown',function(e){
       if(e.key==='Enter'&&e.target.id==='custom-name'){e.preventDefault();const confirm=app.querySelector('[data-action="custom-use"]');if(confirm)confirm.click()}
-      if(e.key==='Escape')closePosterPreview();
     });
-    app.addEventListener('click',async function(e){
-      const button=e.target.closest('[data-action]');if(!button)return;
-      const action=button.dataset.action,id=button.dataset.id;
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!sheetEl.hidden)closeSheet()});
+
+    function handle(action,id,button){
       if(action==='home'){state.page='home';render()}
       else if(action==='archive'){state.page='archive';render()}
-      else if(action==='trial'){
-        state.page='trial';state.step=1;state.category='all';state.query='';state.target=null;state.charge='';state.evidence=[];state.custom='';state.customOpen=false;state.caseMode='manual';state.appealOf=null;state.appealRound=0;render();
-      }
-      else if(action==='random')pickRandom('quick')
-      else if(action==='daily')pickRandom('daily')
+      else if(action==='archive-tab'){state.archiveTab=id;render({scroll:false})}
+      else if(action==='trial'){openTrial()}
+      else if(action==='random')pickRandom('quick');
+      else if(action==='daily')pickRandom('daily');
       else if(action==='gallery'){state.page='gallery';state.category='all';state.query='';state.galleryTab='cases';render()}
       else if(action==='gallery-tab'){state.galleryTab=id;state.query='';render()}
       else if(action==='category'){
         state.category=id;state.page='trial';state.step=1;state.query='';state.target=null;state.charge='';state.evidence=[];state.custom='';state.caseMode='manual';state.appealOf=null;render();
       }
       else if(action==='filter'){state.category=id;render({scroll:false})}
+      else if(action==='clear-query'){state.query='';render({scroll:false,focusId:state.page==='gallery'?'gallery-search':'case-search',selectionStart:0,selectionEnd:0})}
       else if(action==='select-case'){
         const defendant=defendants.find(function(d){return d.id===id});
         if(defendant){state.target=defendant;state.custom='';state.charge=defendant.suggested;state.evidence=[];state.caseMode='manual';state.appealOf=null;state.appealRound=0;state.step=2;state.page='trial';render()}
@@ -363,14 +927,14 @@ async function poster(){
         state.target=defendants.find(function(d){return d.id===id})||null;
         state.custom='';state.charge=state.target?state.target.suggested:'';state.evidence=[];state.caseMode='manual';state.appealOf=null;state.appealRound=0;render({scroll:false});
       }
-      else if(action==='custom-toggle'){state.customOpen=!state.customOpen;render({scroll:false})}
+      else if(action==='custom-toggle'){state.customOpen=!state.customOpen;render({scroll:false,focusId:state.customOpen?'custom-name':null})}
       else if(action==='custom-use'){
         const value=state.custom.trim();
         if(value.length<2||value.length>18){showToast('请输入 2–18 个字的被告名称');return}
-        state.target=null;state.custom=value;state.charge='故意扰乱心情秩序罪';state.evidence=[];state.caseMode='manual';state.appealOf=null;state.appealRound=0;state.step=2;render();
+        state.target=null;state.custom=value;state.charge='故意扰乱心情秩序罪';state.evidence=[];state.caseMode='manual';state.appealOf=null;state.appealRound=0;state.step=2;state.page='trial';render();
       }
       else if(action==='next'){
-        if(state.step===1&&!state.target){showToast('请先选择一位被告');return}
+        if(state.step===1&&!state.target&&!state.custom){showToast('请先选择一位被告');return}
         if(state.step===2&&!state.charge){showToast('请先选择一个罪名');return}
         state.step++;render();
       }
@@ -384,25 +948,45 @@ async function poster(){
       }
       else if(action==='judge'){state.judge=id;render({scroll:false})}
       else if(action==='verdict'){if(!state.evidence.length){showToast('至少提交一条证据');return}openDeliberation()}
-      else if(action==='appeal')startAppeal()
-      else if(action==='reaction')recordReaction(id)
-      else if(action==='poster')await poster()
+      else if(action==='appeal')startAppeal();
+      else if(action==='reaction')recordReaction(id);
+      else if(action==='poster')poster();
       else if(action==='poster-download'){
-        if(!state.posterUrl)return;
+        if(!state.posterUrl){showToast('请先生成判决海报');return}
         const anchor=document.createElement('a');anchor.href=state.posterUrl;anchor.download=state.posterFilename;document.body.appendChild(anchor);anchor.click();anchor.remove();
         showToast('图片下载已发起；手机浏览器也可以长按预览图保存');
       }
-      else if(action==='poster-share')await sharePoster()
-      else if(action==='poster-close')closePosterPreview()
-      else if(action==='copy')await copyVerdictText()
+      else if(action==='poster-share')sharePoster();
+      else if(action==='poster-close')closeSheet();
+      else if(action==='copy')copyVerdictText();
       else if(action==='open-verdict'){
         const item=state.history.find(function(record){return record.id===id});
         if(item){state.result=item;state.page='result';render()}
       }
       else if(action==='delete'){
-        state.history=state.history.filter(function(record){return record.id!==id});
-        if(state.result&&state.result.id===id)state.result=null;
-        save();render();showToast('卷宗已删除');
+        const item=state.history.find(function(r){return r.id===id});
+        if(!item)return;
+        askConfirm('删除卷宗','确定删除「<strong>'+esc(item.target||'该案件')+'</strong>」的卷宗吗？<br>这份判决只保存在本机，删除后无法恢复。',function(){
+          state.history=state.history.filter(function(record){return record.id!==id});
+          if(state.result&&state.result.id===id)state.result=null;
+          save();render({scroll:false});showToast('卷宗已删除');
+        });
       }
-    });
+    }
+
+    function onClick(e){
+      const button=e.target.closest('[data-action]');
+      if(!button)return;
+      const action=button.dataset.action;
+      if(button.closest('.sheet')){
+        if(action==='confirm-ok'){const fn=confirmAction;closeSheet();if(fn)fn();return}
+        if(action==='confirm-cancel'){closeSheet();return}
+        if(['poster-close','poster-download','poster-share'].includes(action)){e.preventDefault();handle(action,button.dataset.id,button)}
+        return;
+      }
+      e.preventDefault();
+      handle(action,button.dataset.id,button);
+    }
+    document.body.addEventListener('click',onClick);
+
     render();
