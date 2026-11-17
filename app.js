@@ -60,7 +60,91 @@ const judgePortrait = './assets/hero-court.jpg';
     function render(){const active=state.page==='archive'?'archive':state.page==='gallery'?'gallery':state.page==='trial'?'trial':'home';navActive(active);app.innerHTML=state.page==='trial'?trial():state.page==='result'?'<section class="page">'+verdict()+'</section>':state.page==='processing'?processing():state.page==='archive'?archive():state.page==='gallery'?gallery():home();window.scrollTo({top:0,behavior:'smooth'})}
     function openDeliberation(){state.page='processing';render();window.setTimeout(function(){makeVerdict()},1050)}
     function pickRandom(){const d=defendants[Math.floor(Math.random()*defendants.length)];state.target=d;state.charge=d.suggested;state.evidence=[evidence[Math.floor(Math.random()*evidence.length)]];state.judge=judgeStyles[Math.floor(Math.random()*judgeStyles.length)].id;openDeliberation()}
-    function poster(){if(!state.result)return;const v=state.result;const c=document.createElement('canvas');c.width=1080;c.height=1440;const g=c.getContext('2d');g.fillStyle='#f7f0e4';g.fillRect(0,0,1080,1440);g.strokeStyle='#cdbb9e';g.lineWidth=3;g.strokeRect(45,45,990,1350);g.fillStyle='#a33d31';g.fillRect(45,45,990,12);g.textAlign='center';g.fillStyle='#9e7a50';g.font='24px Georgia';g.fillText('COURT OF EVERY LITTLE THING',540,120);g.fillStyle='#2d261f';g.font='bold 64px serif';g.fillText('万物审判庭',540,225);g.font='32px serif';g.fillText('娱乐法庭 · 刑事判决书',540,282);g.strokeStyle='#d6c7b1';g.beginPath();g.moveTo(110,330);g.lineTo(970,330);g.stroke();g.textAlign='left';g.fillStyle='#967951';g.font='28px sans-serif';g.fillText('案号',120,410);g.fillStyle='#3c3228';g.font='30px sans-serif';g.fillText(v.docket,250,410);g.fillStyle='#967951';g.font='28px sans-serif';g.fillText('被告',120,505);g.fillStyle='#3c3228';g.font='bold 46px serif';g.fillText(v.target,250,510);g.fillStyle='#967951';g.font='28px sans-serif';g.fillText('罪名',120,600);g.fillStyle='#3c3228';g.font='bold 34px serif';g.fillText(v.charge,250,600);g.fillStyle='#967951';g.font='28px sans-serif';g.fillText('证据',120,700);g.fillStyle='#51463a';g.font='25px sans-serif';v.evidence.forEach((e,i)=>g.fillText((i+1)+'. '+e,250,700+i*52));g.fillStyle='#a33d31';g.fillRect(100,850,880,250);g.textAlign='center';g.fillStyle='#f9eee0';g.font='28px sans-serif';g.fillText('本庭判决如下',540,920);g.font='bold 62px serif';g.fillText(v.sentence,540,1015);g.fillStyle='#3e3227';g.font='28px sans-serif';g.fillText('审判官 · '+v.judge,540,1195);g.font='24px sans-serif';g.fillText(v.judgeComment,540,1250);g.fillStyle='#a33d31';g.font='24px serif';g.fillText('娱乐判决 · 不具法律效力',540,1330);const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='万物审判庭-'+v.docket+'.png';a.click();showToast('判决图片已生成。')}
+    async function poster(){
+      if(!state.result)return;
+      const v=state.result;
+      const canvas=document.createElement('canvas');
+      canvas.width=1080;canvas.height=1440;
+      const g=canvas.getContext('2d');
+      const paper=g.createLinearGradient(0,0,1080,1440);
+      paper.addColorStop(0,'#fbf3e5');paper.addColorStop(1,'#eee0c8');
+      g.fillStyle=paper;g.fillRect(0,0,1080,1440);
+      g.strokeStyle='#9f7547';g.lineWidth=5;g.strokeRect(34,34,1012,1372);
+      g.strokeStyle='#d3b98f';g.lineWidth=2;g.strokeRect(52,52,976,1364);
+      g.fillStyle='#8f2f28';g.fillRect(52,52,976,12);
+      g.fillStyle='#c29350';g.fillRect(52,64,976,4);
+      const drawText=(text,x,y,font,color,align)=>{g.font=font;g.fillStyle=color;g.textAlign=align||'left';g.fillText(String(text),x,y)};
+      const wrap=(text,x,y,maxWidth,lineHeight,font,color)=>{
+        g.font=font;g.fillStyle=color;g.textAlign='left';
+        const lines=[];let line='';
+        for(const char of String(text)){
+          const candidate=line+char;
+          if(line&&g.measureText(candidate).width>maxWidth){lines.push(line);line=char}else{line=candidate}
+        }
+        if(line)lines.push(line);
+        lines.forEach((item,index)=>g.fillText(item,x,y+index*lineHeight));
+        return y+Math.max(1,lines.length)*lineHeight;
+      };
+      const fit=(text,maxWidth,start=42,min=24)=>{
+        let size=start;
+        while(size>min){g.font='bold '+size+'px serif';if(g.measureText(text).width<=maxWidth)break;size-=2}
+        return 'bold '+size+'px serif';
+      };
+      try{
+        const hero=await new Promise((resolve,reject)=>{
+          const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src='./assets/hero-court.jpg';
+        });
+        g.save();
+        g.beginPath();g.rect(84,90,912,300);g.clip();
+        const scale=Math.max(912/hero.width,300/hero.height);
+        const width=hero.width*scale,height=hero.height*scale;
+        g.drawImage(hero,(1080-width)/2,(300-height)/2+90,width,height);
+        g.restore();
+        g.fillStyle='rgba(43,25,19,.22)';g.fillRect(84,90,912,300);
+        g.strokeStyle='#c49a60';g.lineWidth=4;g.strokeRect(84,90,912,300);
+      }catch(error){
+        g.fillStyle='#382721';g.fillRect(84,90,912,300);
+        drawText('万物审判庭',540,245,'bold 68px serif','#f5e5cb','center');
+      }
+      drawText('THE COURT OF EVERY LITTLE THING',540,440,'24px Georgia','#98764d','center');
+      drawText('万物审判庭',540,510,'bold 58px serif','#34251e','center');
+      drawText('娱乐法庭 · 刑事判决书',540,558,'30px serif','#8f3028','center');
+      g.strokeStyle='#c4a77c';g.lineWidth=2;g.beginPath();g.moveTo(130,590);g.lineTo(950,590);g.stroke();
+      const row=(label,value,y,font='30px serif')=>{
+        drawText(label,145,y,'25px sans-serif','#98764f','left');
+        wrap(value,300,y,630,38,font,'#3b2b21');
+      };
+      row('案　号',v.docket,650,'26px sans-serif');
+      row('被　告',v.target,710,fit(v.target,630,40,28));
+      row('罪　名',v.charge,775,fit(v.charge,630,34,25));
+      drawText('主要证据',145,858,'25px sans-serif','#98764f','left');
+      let evidenceY=858;
+      v.evidence.forEach((item,index)=>{
+        evidenceY=wrap((index+1)+'. '+item,300,evidenceY,630,35,'23px sans-serif','#514236');
+      });
+      const panelY=Math.max(970,Math.min(1080,evidenceY+22));
+      g.fillStyle='#92342c';g.fillRect(115,panelY,850,190);
+      g.strokeStyle='#d5af71';g.lineWidth=3;g.strokeRect(127,panelY+12,826,166);
+      drawText('本 庭 判 决 如 下',540,panelY+54,'25px serif','#f8e9d2','center');
+      drawText(v.sentence,540,panelY+124,fit(v.sentence,760,56,34),'#fff0d9','center');
+      wrap('附加处罚：'+v.penalty,190,panelY+160,700,27,'20px sans-serif','#f1d7b2');
+      const footY=panelY+238;
+      drawText('审判官 · '+v.judge,145,footY,'23px serif','#76583a','left');
+      wrap(v.judgeComment,145,footY+42,640,31,'21px serif','#4b3c2e');
+      g.save();g.translate(864,footY+34);g.rotate(-.12);
+      g.strokeStyle='#a6382f';g.lineWidth=5;g.strokeRect(-66,-66,132,132);
+      g.strokeStyle='#a6382f';g.lineWidth=2;g.strokeRect(-57,-57,114,114);
+      drawText('审',0,-3,'bold 58px serif','#a6382f','center');
+      drawText('判 决 生 效',0,35,'15px serif','#a6382f','center');
+      g.restore();
+      g.strokeStyle='#c4a77c';g.beginPath();g.moveTo(130,1352);g.lineTo(950,1352);g.stroke();
+      drawText(v.date+'  ·  纯属娱乐，不具法律效力',540,1380,'19px sans-serif','#907958','center');
+      const anchor=document.createElement('a');
+      anchor.href=canvas.toDataURL('image/png');
+      anchor.download='万物审判庭-'+v.docket+'.png';
+      anchor.click();
+      showToast('判决书已生成，正在保存图片。');
+    }
     app.addEventListener('input',e=>{if(e.target.id==='custom-name')state.custom=e.target.value});
     app.addEventListener('change',e=>{if(e.target.id==='case-search'||e.target.id==='gallery-search'){state.query=e.target.value.trim();render()} });
     app.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;
@@ -80,7 +164,7 @@ const judgePortrait = './assets/hero-court.jpg';
       else if(a==='judge'){state.judge=id;render()}
       else if(a==='verdict'){if(!state.evidence.length){showToast('至少提交一条证据');return}openDeliberation()}
       else if(a==='appeal'){state.page='trial';state.step=3;state.evidence=[];state.result=null;render()}
-      else if(a==='poster')poster()
+      else if(a==='poster')await poster()
       else if(a==='copy'){if(!state.result)return;const v=state.result;const text='我把「'+v.target+'」告上了万物审判庭！\\n罪名：'+v.charge+'\\n判决：'+v.sentence+'\\n审判官：'+v.judge+'\\n你觉得判得合理吗？';try{await navigator.clipboard.writeText(text);showToast('判决文案已复制')}catch(err){showToast('当前环境不支持复制，请手动选择文案')}}
       else if(a==='open-verdict'){const item=state.history.find(x=>x.id===id);if(item){state.result=item;state.page='result';render()}}
       else if(a==='delete'){state.history=state.history.filter(x=>x.id!==id);save();render();showToast('卷宗已删除')}
