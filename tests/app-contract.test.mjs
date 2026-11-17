@@ -87,3 +87,39 @@ test('user journeys and local history remain connected', () => {
   for (const action of ['home','trial','archive','gallery','next','verdict','poster','copy','appeal']) assert.ok(html.includes('data-action="'+action+'"') || appJs.includes("'"+action+"'"), 'missing action: '+action);
   assert.ok(appJs.includes('wanniu-court-github-v1')); assert.ok(appJs.includes('slice(0,80)'));
 });
+
+test('daily case is stable for a given local date and differs from random quick trial', () => {
+  assert.ok(appJs.includes('const getDailyDocket=function()'));
+  assert.ok(appJs.includes("item.source==='daily'&&item.dailyDate===daily.dateKey"));
+  assert.ok(appJs.includes("pickRandom('daily')"));
+  assert.ok(appJs.includes("pickRandom('quick')"));
+});
+test('each defendant has tailored legal charges, evidence and a finding', () => {
+  for (const id of ['monday','meeting','simple','boss','alarm','delivery','rain','read','next','autoplay','renew','algorithm','procrastination','overthink','early','group']) {
+    assert.ok(appJs.includes(id+':['), 'case-specific data missing for '+id);
+  }
+  assert.ok(appJs.includes('const caseEvidence='));
+  assert.ok(appJs.includes('const caseCharges='));
+  assert.ok(appJs.includes('const caseFindings='));
+  assert.ok(appJs.includes('chargesFor(state.target)'));
+  assert.ok(appJs.includes('evidenceFor(state.target)'));
+});
+test('appeal carries forward the original target, charge, and evidence', () => {
+  assert.ok(appJs.includes('function startAppeal()'));
+  assert.ok(appJs.includes('state.appealOf=previous.id'));
+  assert.ok(appJs.includes('state.evidence=Array.isArray(previous.evidence)?previous.evidence.slice(0,2):[]'));
+  assert.ok(appJs.includes('appealRound:state.appealOf?(state.appealRound||1):0'));
+});
+test('post-verdict feedback persists and poster preview supports mobile sharing', () => {
+  assert.ok(appJs.includes('function recordReaction(reaction)'));
+  assert.ok(appJs.includes("['fair','light','heavy']"));
+  assert.ok(appJs.includes('长按图片保存'));
+  assert.ok(appJs.includes('navigator.share'));
+  assert.ok(appJs.includes('data-action="poster-download"'));
+  assert.ok(appJs.includes('data-action="poster-share"'));
+});
+test('live search restores focus and cursor without forcing page scroll', () => {
+  assert.ok(appJs.includes('focusId:id'));
+  assert.ok(appJs.includes('selectionStart:start,selectionEnd:end'));
+  assert.ok(appJs.includes('render({scroll:false})'));
+});
