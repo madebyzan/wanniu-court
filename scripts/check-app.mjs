@@ -34,7 +34,11 @@ const artwork = [
   'assets/categories/social.jpg',
   'assets/categories/digital.jpg',
   'assets/categories/self.jpg',
-  'assets/categories/campus.jpg'
+  'assets/categories/campus.jpg',
+  'assets/props/gavel.jpg',
+  'assets/props/scales.jpg',
+  'assets/props/law-books.jpg',
+  'assets/props/hourglass.jpg'
 ];
 
 for (const path of artwork) {
