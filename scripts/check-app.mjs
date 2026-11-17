@@ -69,5 +69,5 @@ for (const path of artwork) {
   if (!isPng) throw new Error('Missing or invalid PNG asset: ' + path);
 }
 if (/\\.jpe?g/.test(appJs)) throw new Error('Stale JPEG references remain in app.js.');
-for (const path of artwork) if (!appJs.includes(path.replace(/^assets\\//,'')) && !css.includes(path.replace(/^assets\\//,''))) throw new Error('Asset not connected to UI: '+path);
+for (const path of artwork) if (!appJs.includes(path.slice('assets/'.length)) && !css.includes(path.slice('assets/'.length))) throw new Error('Asset not connected to UI: '+path);
 process.stdout.write('Validation passed: all 52 PNG assets are present and connected.\\n');
