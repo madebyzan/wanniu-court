@@ -2,19 +2,26 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const appJs = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 
 if (!html.includes('<html lang="zh-CN">')) {
   throw new Error('The document must declare zh-CN as its language.');
 }
-
-const scriptStart = html.indexOf('<script>');
-const scriptEnd = html.indexOf('</script>', scriptStart + 8);
-if (scriptStart < 0 || scriptEnd < 0 || html.indexOf('<script>', scriptStart + 1) >= 0) {
-  throw new Error('Expected exactly one application script.');
+if (!html.includes('href="./styles.css"')) {
+  throw new Error('The stylesheet must be loaded from a local file.');
+}
+if (!html.includes('src="./app.js"')) {
+  throw new Error('The app module must be loaded from a local file.');
+}
+if (html.includes('<script>')) {
+  throw new Error('The application must not be inlined in index.html.');
 }
 
-const inlineScript = html.slice(scriptStart + 8, scriptEnd);
-new vm.Script(inlineScript, { filename: 'index.inline.js' });
+new vm.Script(appJs, { filename: 'app.js' });
+if (css.length < 5000) {
+  throw new Error('The visual system stylesheet appears incomplete.');
+}
 
 const artwork = [
   'assets/hero-court.jpg',
@@ -36,7 +43,9 @@ for (const path of artwork) {
   if (!isJpeg) throw new Error('Missing or invalid generated artwork: ' + path);
 }
 
-const hasRemoteAsset = ['src="https:', "src='https:", 'href="https:', "href='https:"].some(ref => html.includes(ref));
-if (hasRemoteAsset) throw new Error('Remote resources are not allowed in the mini-tool package.');
+const remotePrefixes = ['src="https:', "src='https:", 'href="https:', "href='https:"];
+if (remotePrefixes.some(prefix => html.includes(prefix) || appJs.includes(prefix))) {
+  throw new Error('Remote resources are not allowed in the mini-tool package.');
+}
 
-process.stdout.write('Application validation passed. Inline JS parsed; 11 local JPEG assets checked.\\n');
+process.stdout.write('Application validation passed. App module parsed; local stylesheet and 11 generated JPEG assets checked.\\n');
