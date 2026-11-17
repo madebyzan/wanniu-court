@@ -4,9 +4,8 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const scriptStart = html.indexOf('<script>');
-const scriptEnd = html.indexOf('</script>', scriptStart + 8);
-const inlineScript = scriptStart >= 0 && scriptEnd > scriptStart ? html.slice(scriptStart + 8, scriptEnd) : '';
+const appJs = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const artwork = [
   'assets/hero-court.jpg',
   'assets/judge-cat.jpg',
@@ -21,15 +20,23 @@ const artwork = [
   'assets/categories/campus.jpg'
 ];
 
-test('document declares Chinese language and a mobile-safe viewport', () => {
+test('document uses Chinese language and local application modules', () => {
   assert.ok(html.includes('<html lang="zh-CN">'));
   assert.ok(html.includes('viewport-fit=cover'));
-  assert.ok(html.includes('id="app"'));
+  assert.ok(html.includes('href="./styles.css"'));
+  assert.ok(html.includes('src="./app.js"'));
+  assert.equal(html.includes('<script>'), false);
 });
 
-test('main application script parses without executing browser side effects', () => {
-  assert.ok(inlineScript.length > 1000);
-  assert.doesNotThrow(() => new vm.Script(inlineScript));
+test('application module parses without executing browser side effects', () => {
+  assert.ok(appJs.length > 10000);
+  assert.doesNotThrow(() => new vm.Script(appJs));
+});
+
+test('visual system is an independently loaded, substantial stylesheet', () => {
+  assert.ok(css.length > 5000);
+  assert.ok(css.includes('prefers-reduced-motion:reduce'));
+  assert.ok(css.includes('max-width:640px'));
 });
 
 test('generated artwork is valid local JPEG and remote assets are not referenced', async () => {
@@ -39,22 +46,17 @@ test('generated artwork is valid local JPEG and remote assets are not referenced
     assert.deepEqual(Array.from(bytes.subarray(0, 3)), [0xff, 0xd8, 0xff], path + ' should be a JPEG');
   }
   for (const remotePrefix of ['src="https:', "src='https:", 'href="https:', "href='https:"]) {
-    assert.equal(html.includes(remotePrefix), false);
+    assert.equal(html.includes(remotePrefix) || appJs.includes(remotePrefix), false);
   }
 });
 
 test('key user journeys are wired to explicit actions', () => {
   for (const action of ['home', 'trial', 'archive', 'gallery', 'next', 'verdict', 'poster', 'copy', 'appeal']) {
-    assert.ok(html.includes('data-action="' + action + '"') || inlineScript.includes("'" + action + "'"), 'missing action: ' + action);
+    assert.ok(html.includes('data-action="' + action + '"') || appJs.includes("'" + action + "'"), 'missing action: ' + action);
   }
 });
 
-test('the experience includes responsive and reduced-motion treatments', () => {
-  assert.ok(html.includes('max-width:640px'));
-  assert.ok(html.includes('prefers-reduced-motion:reduce'));
-});
-
 test('history uses a namespaced local storage key and is bounded', () => {
-  assert.ok(inlineScript.includes('wanniu-court-github-v1'));
-  assert.ok(inlineScript.includes('slice(0,80)'));
+  assert.ok(appJs.includes('wanniu-court-github-v1'));
+  assert.ok(appJs.includes('slice(0,80)'));
 });
