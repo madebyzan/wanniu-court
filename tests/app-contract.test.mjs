@@ -4,7 +4,20 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const inlineScript = Array.from(html.matchAll(/<script>([\s\S]*?)<\/script>/g))[0]?.[1] || '';
+const inlineScript = Array.from(html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g))[0]?.[1] || '';
+const artwork = [
+  'assets/hero-court.jpg',
+  'assets/judge-cat.jpg',
+  'assets/judge-frog.jpg',
+  'assets/archive-cat.jpg',
+  'assets/evidence-objects.jpg',
+  'assets/categories/work.jpg',
+  'assets/categories/life.jpg',
+  'assets/categories/social.jpg',
+  'assets/categories/digital.jpg',
+  'assets/categories/self.jpg',
+  'assets/categories/campus.jpg'
+];
 
 test('document declares Chinese language and a mobile-safe viewport', () => {
   assert.match(html, /<html lang="zh-CN">/);
@@ -17,13 +30,17 @@ test('main application script parses without executing browser side effects', ()
   assert.doesNotThrow(() => new vm.Script(inlineScript));
 });
 
-test('generated artwork is embedded locally and remote resources are not referenced', () => {
-  assert.match(inlineScript, /data:image\/jpeg;base64,/);
+test('generated local artwork is valid JPEG and remote resources are not referenced', async () => {
+  for (const path of artwork) {
+    const bytes = await readFile(new URL('../' + path, import.meta.url));
+    assert.ok(bytes.length > 500, path + ' should not be empty');
+    assert.deepEqual(Array.from(bytes.subarray(0, 3)), [0xff, 0xd8, 0xff], path + ' should be a JPEG');
+  }
   assert.doesNotMatch(html, /(?:src|href)=["']https?:\/\//i);
 });
 
 test('key user journeys are wired to explicit actions', () => {
-  for (const action of ['home', 'trial', 'archive', 'next', 'verdict', 'poster', 'copy', 'appeal']) {
+  for (const action of ['home', 'trial', 'archive', 'gallery', 'next', 'verdict', 'poster', 'copy', 'appeal']) {
     assert.ok(html.includes('data-action="' + action + '"') || inlineScript.includes("'" + action + "'"), 'missing action: ' + action);
   }
 });
