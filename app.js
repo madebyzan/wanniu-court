@@ -430,27 +430,29 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       const outcome=outcomeOf(v);
       const appealLabel=v.appealRound?'第 '+(v.appealRound+1)+' 次审理':'初审判决';
       const caseType=v.source==='daily'?'每日专属案件':v.source==='quick'?'随机速审':v.source==='appeal'?'再审案件':'正式立案';
-      const reactions=[{id:'fair',label:'判得刚好',ic:'check'},{id:'light',label:'判得太轻',ic:'plus'},{id:'heavy',label:'判得太重',ic:'close'}];
+      const reactions=[{id:'fair',label:'刚好',ic:'check'},{id:'light',label:'太轻',ic:'plus'},{id:'heavy',label:'太重',ic:'close'}];
+      const ev=(v.evidence||[]).length
+        ?'<ol>'+v.evidence.map(function(e){return '<li>'+esc(e)+'</li>'}).join('')+'</ol>'
+        :'<span class="sub">当事人陈述已记录在案。</span>';
       return '<div class="fade-in">'+
-      '<div class="verdict-head">'+
-        '<div class="declare"><span class="seal">宣</span><span class="eyebrow">The Verdict Is In · '+esc(caseType)+' · '+appealLabel+'</span></div>'+
-        '<h1 class="display">'+(v.appealRound?'再审结束。':'审判结束。')+'<em>判决如下。</em></h1>'+
-        '<p class="lede">'+(v.appealRound?'本庭已重新听取证据，并作出新的裁定。':'本庭已完成审理，卷宗已归档。现在轮到你来看看判得合不合理。')+'</p>'+
+      '<div class="verdict-bar">'+
+        '<span class="seal">宣</span>'+
+        '<span class="txt"><strong>'+(v.appealRound?'再审结束，判决如下':'审判结束，判决如下')+'</strong>'+
+        '<small>'+esc(caseType)+' · '+esc(appealLabel)+' · 卷宗已归档</small></span>'+
+        outcomeBadge(v)+
       '</div>'+
       '<article class="doc">'+
+        '<div class="doc-crest"><img src="'+sceneAssets.verdict+'" alt="万物审判庭判决书抬头"></div>'+
         '<div class="doc-body">'+
-          '<div class="doc-head">Court of Every Little Thing</div>'+
-          '<div class="doc-title"><img class="laurel" src="'+propAssets.laurel+'" alt=""><h2>'+(outcome==='guilty'?'刑事判决书':'和解书')+'</h2>'+
-            '<small>娱乐法庭 · '+esc(appealLabel)+'</small></div>'
-          +'<div class="doc-docket">案号 '+esc(v.docket)+'</div>'+
+          '<div class="doc-title"><h2>'+(outcome==='guilty'?'刑事判决书':'和解书')+'</h2>'+
+            '<small>娱乐法庭 · '+esc(appealLabel)+'</small>'+
+            '<span class="docket">案号 '+esc(v.docket)+'</span>'+
+            '<span class="rule"></span></div>'+
           '<div class="doc-row"><b>被告</b><div class="v"><strong>'+esc(v.target)+'</strong>'+
             '<span class="sub">'+esc(v.category?catName(v.category):'自定义案件')+' · '+esc(caseType)+'</span></div></div>'+
-          '<div class="doc-row"><b>罪名</b><div class="v"><strong>'+esc(v.charge)+'</strong>'+
-            '<span class="sub">'+(outcome==='guilty'?'经本庭审理，相关行为已造成持续性精神损耗。':'指控成立但情节显著轻微，本庭未予实刑。')+'</span></div></div>'+
+          '<div class="doc-row"><b>罪名</b><div class="v"><strong>'+esc(v.charge)+'</strong></div></div>'+
           '<div class="doc-focus"><small>本案争议焦点</small><p>'+esc(v.finding||'本庭已完成对相关行为的审理。')+'</p></div>'+
-          '<div class="doc-row"><b>证据</b><div class="v">'+
-            ((v.evidence||[]).length?'<ol>'+v.evidence.map(function(e){return '<li>'+esc(e)+'</li>'}).join('')+'</ol>':'<span class="sub">当事人陈述已记录在案。</span>')+
-          '</div></div>'+
+          '<div class="doc-row"><b>证据</b><div class="v">'+ev+'</div></div>'+
           '<div class="doc-verdict'+(outcome==='guilty'?'':' is-settle')+'">'+
             '<span class="label">'+(outcome==='guilty'?'判决如下':'责令和解')+'</span>'+
             '<div class="sentence"><strong>'+esc(v.sentence)+'</strong><small>'+esc(outcome==='guilty'?'附加处罚：'+v.penalty:'和解条件：'+v.penalty)+'</small></div>'+
@@ -459,20 +461,22 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
             '<div class="stamp"><b>审</b>判决生效</div></div>'+
           '<div class="doc-foot"><span>'+esc(v.date)+'</span><span class="r">纯属娱乐 · 不具法律效力</span></div>'+
         '</div>'+
+        '<div class="doc-seal"><img src="'+sceneAssets.verdict+'" alt=""></div>'+
       '</article>'+
-      '<section class="reaction panel panel-pad">'+
-        '<h3 class="display" style="font-size:16px">你觉得这份判决合理吗？</h3>'+
-        '<p class="hint">选一个态度，它会留在这份本地卷宗里。</p>'+
-        '<div class="reaction-grid">'+reactions.map(function(r){
-          return '<button class="'+(v.reaction===r.id?'is-on':'')+'" data-action="reaction" data-id="'+r.id+'" aria-pressed="'+(v.reaction===r.id?'true':'false')+'">'+icon(r.ic)+'<span>'+r.label+'</span></button>';
-        }).join('')+'</div>'+
-        (v.reaction?'<p class="hint" style="margin-top:10px">'+(v.reaction==='fair'?'已记录：判得刚好':v.reaction==='light'?'已记录：判得太轻，下次可以多交一条证据':'已记录：判得太重')+'</p>':'')+
+      '<section class="reaction panel">'+
+        '<div class="react-line"><span>判得合理吗？</span>'+
+          '<div class="reaction-grid">'+reactions.map(function(r){
+            return '<button class="'+(v.reaction===r.id?'is-on':'')+'" data-action="reaction" data-id="'+r.id+'" aria-pressed="'+(v.reaction===r.id?'true':'false')+'">'+icon(r.ic)+'<span>'+r.label+'</span></button>';
+          }).join('')+'</div></div>'+
+        '<p class="hint">'+(v.reaction
+          ?(v.reaction==='fair'?'已记录：判得刚好':v.reaction==='light'?'已记录：判得太轻，下次可以多交一条证据':'已记录：判得太重')
+          :'态度会写进这份本地卷宗。')+'</p>'+
       '</section>'+
       '<div class="action-grid">'+
         '<button class="btn btn--solid" data-action="poster">'+icon('share')+'<span>判决海报</span></button>'+
         '<button class="btn btn--ink" data-action="copy">'+icon('copy')+'<span>复制文案</span></button>'+
         '<button class="btn btn--ghost" data-action="appeal">'+icon('retry')+'<span>申请再审</span></button>'+
-        '<button class="btn btn--ghost" data-action="archive">'+icon('archive')+'<span>存入卷宗</span></button>'+
+        '<button class="btn btn--ghost" data-action="archive">'+icon('archive')+'<span>我的卷宗</span></button>'+
       '</div>'+
       '</div>';
     }

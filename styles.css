@@ -1169,7 +1169,34 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 @keyframes tilt { 0%, 100% { transform: rotate(-5deg) } 50% { transform: rotate(5deg) } }
 
 /* ---------- 8. Verdict --------------------------------------------------- */
-.verdict-head { padding: 18px var(--gutter) 0; display: grid; gap: 6px; }
+.verdict-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 2 * var(--gutter));
+  max-width: 420px;
+  margin: 12px auto 0;
+  padding: 9px 12px;
+  border-radius: var(--r-m);
+  background: linear-gradient(178deg, rgba(46, 30, 21, .97), rgba(30, 20, 14, .97));
+  box-shadow: inset 0 0 0 1px rgba(211, 172, 97, .3), var(--shadow-s);
+  color: #ecdcc0;
+}
+.verdict-bar .seal {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  font: 600 15px/1 var(--f-display);
+  color: #f6e7c8;
+  background: linear-gradient(160deg, var(--red-2), var(--red-deep));
+  box-shadow: inset 0 0 0 1px rgba(246, 231, 200, .35);
+}
+.verdict-bar .txt { min-width: 0; display: grid; gap: 2px; }
+.verdict-bar .txt strong { font: 600 14px/1.3 var(--f-display); letter-spacing: .08em; color: #f5e7c9; }
+.verdict-bar .txt small { font-size: 10px; letter-spacing: .06em; color: #b39a76; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .verdict-head .declare {
   display: inline-flex;
   align-items: center;
@@ -1187,51 +1214,85 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   transform: rotate(-6deg);
 }
 
-/* The verdict document uses verdict-paper.png as a true 9-slice frame.
-   The artwork is only stretchable in one place: rows 490-910 are plain
-   parchment (verified pixel-wise), so the slices are top 490 / bottom 538.
-   Border widths equal slice x (docWidth / 1086), which makes every band
-   render at one uniform scale - the curtains, crest, tassels and wax seal
-   stay perfectly proportional and only blank paper stretches. The document
-   is therefore pinned to the 358px width those numbers were derived from. */
+/* The verdict document uses verdict-paper.png as two proportionally-cropped
+   bands instead of a four-sided frame. The frame cost 339px of pure ornament
+   (161px top + 178px bottom) and left ~87px of blank parchment inside the top
+   band, which is why the document ran to four screens. Cropping with
+   object-fit: cover keeps the crest (source rows 0-490, tassels included) and
+   the wax-seal band (rows 1240-1448) at their exact natural scale while
+   costing only 161px + 69px, and the title is pulled up into the crest's own
+   blank parchment so no ornament is wasted. The body between the bands is CSS
+   paper sampled from the artwork at the cut lines: #face91 -> #fad296 ->
+   #f7cc8f, with the same grain, so the seam is invisible. */
 .doc {
   width: calc(100% - 2 * var(--gutter));
   max-width: 358px;
-  margin: 14px auto 0;
-  border-style: solid;
-  border-width: 161px 15px 177px 15px;
-  border-image: url("./assets/scenes/verdict-paper.png") 490 46 538 46 fill / 161px 15px 177px 15px stretch;
-  background: none;
-  box-shadow: var(--shadow-m);
+  margin: 12px auto 0;
+  border-radius: 3px;
+  overflow: clip;
+  background:
+    var(--grain),
+    linear-gradient(178deg, #face91 0%, #fad296 42%, #f8ce90 100%);
+  background-size: 150px 150px, auto;
+  background-blend-mode: soft-light, normal;
+  box-shadow:
+    inset 0 0 0 1px #a8783f,
+    inset 0 0 0 4px rgba(255, 248, 232, .42),
+    inset 0 0 0 5px #c9a468,
+    var(--shadow-m);
 }
-.doc-head {
+.doc-crest, .doc-seal { position: relative; overflow: hidden; }
+.doc-crest { aspect-ratio: 1086 / 490; }
+.doc-crest img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+/* feather the artwork into the CSS paper so the band edge never shows as a rule */
+.doc-crest::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  background: linear-gradient(180deg, rgba(250, 206, 145, 0), #face91 78%, #fad194);
+}
+.doc-seal::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 22px;
+  background: linear-gradient(0deg, rgba(247, 204, 143, 0), #f8ce90);
+  z-index: 2;
+}
+.doc-seal { aspect-ratio: 1086 / 208; }
+.doc-seal img { width: 100%; height: 100%; object-fit: cover; object-position: center bottom; }
+.doc-body {
+  padding: 0 18px 10px;
+  /* percentage margins resolve against the container width, so pulling the
+     title into the crest's own blank parchment stays proportional at 320px */
+  margin-top: -18.4%;
+  position: relative;
+  z-index: 2;
+}
+.doc-title { text-align: center; padding: 0 0 2px; }
+.doc-title h2 { font: 600 24px/1.2 var(--f-display); letter-spacing: .28em; color: #2b1c13; text-indent: .28em; }
+.doc-title small { display: block; margin-top: 4px; font-size: 10px; letter-spacing: .12em; color: #7a5a34; }
+.doc-title .docket {
   display: block;
-  font: 400 8.5px/1.4 var(--f-latin);
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: #9a7644;
-  text-align: center;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(150, 108, 52, .35);
+  margin-top: 3px;
+  font: 400 10.5px/1.5 var(--f-display);
+  letter-spacing: .04em;
+  color: #6d4c22;
 }
-.doc-title { text-align: center; padding: 12px 0 4px; }
-.doc-title h2 { font: 600 25px/1.2 var(--f-display); letter-spacing: .3em; color: #2b1c13; text-indent: .3em; }
-.doc-title small { display: block; margin-top: 6px; font-size: 10.5px; letter-spacing: .18em; color: #7a5a34; }
-.doc-title .laurel { width: 78px; height: 38px; object-fit: contain; margin: 0 auto 4px; opacity: .9; }
-.doc-docket {
-  text-align: center;
-  font: 400 11.5px/1.5 var(--f-display);
-  letter-spacing: .1em;
-  color: #7a5a34;
-  padding: 0 0 10px;
-  border-bottom: 1px solid rgba(150, 108, 52, .35);
-}
+.doc-title .rule { width: 92px; height: 1px; margin: 8px auto 0; background: linear-gradient(90deg, transparent, rgba(150,108,52,.6), transparent); }
+
+
 
 .doc-row {
   display: grid;
   grid-template-columns: 58px 1fr;
   gap: 10px;
-  padding: 11px 0;
+  padding: 9px 0;
   border-bottom: 1px solid rgba(150, 108, 52, .3);
   align-items: start;
 }
@@ -1251,8 +1312,8 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   font-family: var(--f-display);
 }
 .doc-focus {
-  margin: 12px 0;
-  padding: 12px 14px;
+  margin: 10px 0;
+  padding: 10px 12px;
   border-left: 3px solid var(--red);
   background: rgba(153, 48, 42, .07);
   border-radius: 0 var(--r-m) var(--r-m) 0;
@@ -1260,7 +1321,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .doc-focus small { display: block; font-size: 10.5px; letter-spacing: .16em; color: var(--red-ink); margin-bottom: 5px; }
 .doc-focus p { font: 400 13px/1.75 var(--f-display); color: var(--ink-2); }
 
-.doc-verdict { margin: 14px 0 12px; text-align: center; }
+.doc-verdict { margin: 12px 0 10px; text-align: center; }
 .doc-verdict .label {
   display: inline-grid;
   place-items: center;
@@ -1276,8 +1337,8 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   text-shadow: 0 1px 0 rgba(255, 246, 226, .6);
 }
 .doc-verdict .sentence {
-  margin-top: 10px;
-  padding: 16px 14px;
+  margin-top: 8px;
+  padding: 13px 12px;
   border-radius: var(--r-m);
   background: linear-gradient(178deg, #a1362c, #6f1d18);
   color: #fbeed3;
@@ -1293,8 +1354,8 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   grid-template-columns: 1fr auto;
   gap: 12px;
   align-items: center;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid rgba(192, 163, 119, .5);
 }
 .doc-comment .who { font-size: 10.5px; letter-spacing: .14em; color: var(--muted); margin-bottom: 5px; }
@@ -1312,14 +1373,17 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 }
 .doc-foot .r { margin-left: auto; }
 
-.reaction { margin: 16px var(--gutter) 0; }
-.reaction-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.reaction { margin: 12px var(--gutter) 0; padding: 12px 14px; }
+.react-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.react-line > span { font: 600 12.5px/1.4 var(--f-display); color: var(--ink-2); letter-spacing: .04em; }
+.react-line .reaction-grid { margin-top: 0; }
+.reaction-grid { display: flex; gap: 6px; margin-left: auto; }
 .reaction-grid button {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
-  padding: 11px 6px;
-  border-radius: var(--r-m);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border-radius: 999px;
   background: rgba(255, 250, 238, .6);
   box-shadow: inset 0 0 0 1px var(--line);
   font-size: 11.5px;
@@ -1331,11 +1395,11 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .reaction-grid button.is-on { box-shadow: inset 0 0 0 1.5px var(--red); color: var(--red-ink); background: rgba(153, 48, 42, .08); font-weight: 600; }
 .reaction-grid button.is-on .ic { color: var(--red); }
 
-.action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px var(--gutter) 0; }
+.action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px var(--gutter) 0; }
 .action-grid .btn {
   flex-direction: column;
-  gap: 5px;
-  min-height: 62px;
+  gap: 4px;
+  min-height: 56px;
   padding: 10px 4px;
   font-size: 11px;
   letter-spacing: .06em;
@@ -1550,12 +1614,8 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 /* Small phones: the certificate frame is pinned to a 288px box, so the
    border widths are re-derived from the same 0.265 scale factor. */
 @media (max-width: 359px) {
-  .doc {
-    border-width: 130px 12px 143px 12px;
-    border-image: url("./assets/scenes/verdict-paper.png") 490 46 538 46 fill / 130px 12px 143px 12px stretch;
-  }
   .btn--plaque, .btn--ticket { font-size: 14px; letter-spacing: .08em; padding: 12px 16px; }
-  .doc-body { padding: 0 2px; }
+  .doc-body { padding: 0 12px 8px; }
   .doc-row { grid-template-columns: 50px 1fr; gap: 8px; }
   .quick { grid-template-columns: repeat(2, 1fr); }
   .action-grid { grid-template-columns: repeat(2, 1fr); }

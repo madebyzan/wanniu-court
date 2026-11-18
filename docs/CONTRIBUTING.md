@@ -26,7 +26,7 @@ npm test         # 21 项产品与视觉契约
 端到端与视觉复核（需要 Playwright，见 [tools/README.md](../tools/README.md)）：
 
 ```bash
-node tools/verify.mjs   # 46 项端到端断言，失败即非零退出
+node tools/verify.mjs   # 50 项端到端断言（含「判决书 ≤ 1.8 屏」），失败即非零退出
 node tools/tour.mjs     # 全界面整页截图
 node tools/poster.mjs   # 导出 1080x1440 海报原图
 ```

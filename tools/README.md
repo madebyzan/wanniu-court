@@ -15,5 +15,6 @@ ln -sfn "$(dirname "$(find ~/.fnm -type d -name playwright-core -path '*@playwri
 | `node tools/verify.mjs` | 端到端功能校验：导航、三步立案、证据上限、判决、海报尺寸、再审、删除确认、搜索焦点、每日案件、图鉴分页、无障碍属性 |
 | `node tools/tour.mjs [目录]` | 走一遍全部界面并输出整页截图，用于视觉复核 |
 | `node tools/poster.mjs [custom]` | 导出 1080×1440 海报原图；`custom` 走自定义被告路径 |
+| `node tools/len.mjs` | 在 320/375/390/430/520/760px 下量判决书两条装饰带的实际尺寸与整页屏数 |
 
 截图默认写到 `shots/`（已在 .gitignore 中忽略）。

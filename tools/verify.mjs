@@ -46,7 +46,25 @@ await click('.pickbar [data-action="verdict"]');
 t('deliberation shows', await p.locator('.delib-steps .delib-step').count()===4);
 await p.waitForTimeout(5400);
 t('verdict rendered', await p.locator('.doc').count()===1);
-t('doc has frame image', await p.evaluate(()=>getComputedStyle(document.querySelector('.doc')).borderImageSource.includes('verdict-paper')));
+const bands = await p.evaluate(() => {
+  const pick = sel => {
+    const host = document.querySelector(sel);
+    if (!host) return null;
+    const im = host.tagName === 'IMG' ? host : host.querySelector('img');
+    const r = host.getBoundingClientRect();
+    return { src: im && im.getAttribute('src'), fit: im && getComputedStyle(im).objectFit, w: r.width, h: r.height };
+  };
+  return {
+    crest: pick('.doc-crest'),
+    seal: pick('.doc-seal'),
+    page: document.documentElement.scrollHeight
+  };
+});
+t('crest band uses verdict artwork cropped, not stretched', !!(bands.crest && bands.crest.src.includes('verdict-paper') && bands.crest.fit === 'cover'), JSON.stringify(bands.crest));
+t('seal band uses verdict artwork cropped', !!(bands.seal && bands.seal.src.includes('verdict-paper') && bands.seal.fit === 'cover'), JSON.stringify(bands.seal));
+t('certificate bands stay proportional to width', Math.abs(bands.crest.h / bands.crest.w - 490 / 1086) < 0.02, 'crest ratio ' + (bands.crest.h / bands.crest.w).toFixed(3));
+t('verdict page fits 1.8 screens at 390px', bands.page <= 844 * 1.8, bands.page + 'px = ' + (bands.page / 844).toFixed(2) + ' screens');
+t('verdict summary bar carries outcome + docket', await p.locator('.verdict-bar').count() === 1 && (await p.locator('.verdict-bar .badge').count()) === 1);
 const st1=await state();
 t('history persisted', st1.hist===1, 'hist='+st1.hist);
 t('route is #/verdict', st1.hash==='#/verdict', st1.hash);
