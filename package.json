@@ -1,13 +1,18 @@
 {
   "name": "wanniu-court",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "type": "module",
-  "description": "A playful, local-first mock courtroom for life's tiny annoyances.",
+  "description": "A playful, local-first mock courtroom for life's tiny annoyances. Ships as a Xiaohongshu minitool offline zip.",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "check": "node scripts/check-app.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "assets": "python3 scripts/prepare-assets.py",
+    "build": "node scripts/build-minitool.mjs",
+    "audit": "node .codex/minitool-zip-builder/scripts/audit_artifact.mjs ./dist",
+    "verify": "node tools/verify.mjs",
+    "smoke": "node tools/smoke.mjs"
   },
   "engines": {
     "node": ">=20"

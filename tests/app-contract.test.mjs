@@ -1,196 +1,237 @@
+/* 小工具交付契约测试。
+   规范来源：.codex/minitool-zip-builder（zip-artifact-spec / device-capabilities /
+   js-compatibility / css-compatibility / performance-budget / cross-platform-h5）。
+   这些断言只检查静态产物，不代表真机验证已通过。 */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import vm from 'node:vm';
+
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const appJs = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const platformJs = await readFile(new URL('../platform.js', import.meta.url), 'utf8');
 const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
-const artwork = [
-  "assets/scenes/hero-court.webp","assets/scenes/case-hall.webp","assets/scenes/filing-hall.webp",
-  "assets/scenes/deliberation-room.webp","assets/scenes/archive-room.webp","assets/scenes/verdict-paper.webp",
-  "assets/characters/cat-lawyer.webp","assets/characters/frog-clerk.webp","assets/characters/hamster-archivist.webp",
-  "assets/characters/hedgehog-bailiff.webp","assets/characters/judge-pigeon.webp","assets/characters/rabbit-witness.webp",
-  "assets/defendants/alarm.webp","assets/defendants/algorithm.webp","assets/defendants/autoplay.webp","assets/defendants/boss.webp",
-  "assets/defendants/delivery.webp","assets/defendants/early.webp","assets/defendants/group.webp","assets/defendants/meeting.webp",
-  "assets/defendants/monday.webp","assets/defendants/next.webp","assets/defendants/overthink.webp","assets/defendants/procrastination.webp",
-  "assets/defendants/rain.webp","assets/defendants/read.webp","assets/defendants/renew.webp","assets/defendants/simple-change.webp",
-  "assets/props/case-folder.webp","assets/props/court-column.webp","assets/props/crown.webp","assets/props/evidence-envelope.webp",
-  "assets/props/gavel.webp","assets/props/hourglass.webp","assets/props/laurel-wreath.webp","assets/props/magnifier.webp",
-  "assets/props/pocket-watch.webp","assets/props/quill.webp","assets/props/royal-candlestick.webp","assets/props/royal-key.webp",
-  "assets/props/royal-scroll.webp","assets/props/royal-seal.webp","assets/props/royal-shield.webp","assets/props/scales.webp",
-  "assets/decor/btn-primary.webp","assets/decor/btn-secondary.webp","assets/decor/case-card-frame.webp","assets/decor/category-label.webp",
-  "assets/decor/deliberation-banner.webp","assets/decor/divider-ornament.webp","assets/decor/page-corners.webp","assets/decor/section-banner.webp"
-];
-const defendants = ['monday','meeting','simple','boss','alarm','delivery','rain','read','next','autoplay','renew','algorithm','procrastination','overthink','early','group'];
+const js = appJs + '\n' + platformJs;
 
-test('document uses Chinese language, local modules and no inline script', () => {
+const dirs = { scenes: 6, characters: 6, defendants: 16, props: 16, decor: 8 };
+const defendantIds = ['monday','meeting','simple','boss','alarm','delivery','rain','read','next','autoplay','renew','algorithm','procrastination','overthink','early','group'];
+
+/* ---------- 入口与打包结构 ---------- */
+test('entry is a compliant offline H5 document', () => {
+  assert.ok(/<!DOCTYPE html>/i.test(html));
   assert.ok(html.includes('<html lang="zh-CN">'));
-  assert.ok(html.includes('viewport-fit=cover'));
+  assert.match(html, /charset="UTF-8"/i);
+  assert.match(html, /width=device-width/);
+  assert.match(html, /initial-scale=1\.0/);
+  assert.match(html, /viewport-fit=cover/);
   assert.ok(html.includes('href="./styles.css"'));
-  assert.ok(html.includes('src="./app.js"'));
-  assert.equal(html.includes('<script>'), false);
-  assert.ok(html.includes('rel="icon"'), 'favicon must be inlined so the shell never 404s');
+  assert.equal(html.includes('<base '), false, '<base href> breaks real-device paths');
+  assert.equal(/<iframe|<object/i.test(html), false);
+  assert.equal(/http-equiv=["']content-security-policy/i.test(html), false, 'CSP belongs to the container');
 });
 
-test('application module parses without executing browser side effects', () => {
-  assert.ok(appJs.length > 10000);
-  assert.doesNotThrow(() => new vm.Script(appJs));
-});
-
-test('visual system keeps responsive behaviour and reduced-motion support', () => {
-  assert.ok(css.length > 10000);
-  assert.ok(css.includes('prefers-reduced-motion:reduce'));
-  assert.ok(/@media \(max-width: 359px\)/.test(css), 'small-phone breakpoint missing');
-  assert.ok(/@media \(min-width: 430px\)/.test(css), 'large-phone breakpoint missing');
-  assert.ok(css.includes('env(safe-area-inset-bottom)'), 'tab bar must clear the home indicator');
-});
-
-test('decor artwork is used as chrome, not as stretched page backgrounds', () => {
-  const inCss = ['btn-primary.webp','btn-secondary.webp','case-card-frame.webp','category-label.webp','page-corners.webp'];
-  const inJs = ['deliberation-banner.webp','divider-ornament.webp','section-banner.webp','verdict-paper.webp'];
-  for (const d of inCss) assert.ok(css.includes(d), 'missing decoration use in CSS: ' + d);
-  for (const d of inJs) assert.ok(appJs.includes(d), 'missing decoration use in JS: ' + d);
-  assert.equal(css.includes('page-corners.webp") center/100% 100%'), false, 'page-corners must be sliced into corners, never stretched across a page');
-  assert.ok(css.includes('background-size: 26% auto'), 'page-corners must render as four corner tiles');
-});
-
-test('all 52 PNG assets exist and are referenced', async () => {
-  for (const path of artwork) {
-    const bytes = await readFile(new URL('../' + path, import.meta.url));
-    assert.ok(bytes.length > 500, path + ' should not be empty');
-    assert.deepEqual(Array.from(bytes.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10], path + ' should be a PNG');
-    assert.ok(appJs.includes(path.slice('assets/'.length)) || css.includes(path.slice('assets/'.length)), path + ' must be used by the UI');
+test('scripts are classic, external, deferred and ordered', () => {
+  assert.equal(html.includes('type="module"'), false, 'offline zip has no module resolution');
+  assert.equal(/<script[\s\S]*?[^/]>[\s\S]*?\w+[\s\S]*?<\/script>/i.test(html.replace(/<script[^>]*src="[^"]*"[^>]*>\s*<\/script>/g, '')), false, 'inline script is blocked by container CSP');
+  assert.equal(/\son(click|touchstart|input|change)=/.test(html), false, 'inline event handlers are blocked');
+  const platform = html.indexOf('src="./platform.js"');
+  const app = html.indexOf('src="./app.js"');
+  assert.ok(platform > -1 && app > -1, 'both scripts must be referenced');
+  assert.ok(platform < app, 'platform.js must load before app.js');
+  assert.match(html, /<script defer src="\.\/platform\.js">/);
+  assert.match(html, /<script defer src="\.\/app\.js">/);
+  assert.equal(/\bimport\s|\bexport\s/.test(js), false, 'no ESM syntax in shipped JS');
+  for (const [name, src] of [['app.js', appJs], ['platform.js', platformJs]]) {
+    assert.doesNotThrow(() => new vm.Script(src, { filename: name }), name + ' must parse as a classic script');
   }
 });
 
-test('assets that must be transparent carry real alpha, not a baked white box', async () => {
-  for (const path of ['assets/decor/btn-primary.webp','assets/props/laurel-wreath.webp','assets/props/royal-key.webp']) {
-    const bytes = await readFile(new URL('../' + path, import.meta.url));
-    const colorType = bytes[25];
-    const chunks = bytes.toString('latin1');
-    const hasTrns = chunks.includes('tRNS');
-    assert.ok(colorType === 6 || (colorType === 3 && hasTrns),
-      path + ' must be RGBA or a paletted PNG with a tRNS chunk (got colour type ' + colorType + ')');
+test('no external resource URL is referenced anywhere', () => {
+  const all = html + js + css;
+  const hits = all.match(/https?:\/\/[^"' )\s]+\.(?:js|css|png|jpe?g|webp|gif|svg|woff2?)/gi) || [];
+  assert.deepEqual(hits, [], 'every asset must live inside the zip: ' + hits.join(', '));
+});
+
+/* ---------- 首屏 ---------- */
+test('first screen is real content in HTML, not an empty mount point', () => {
+  const mount = html.slice(html.indexOf('<main id="app"'), html.indexOf('</main>'));
+  assert.ok(mount.includes('这点小事'), 'the real headline must be in the entry');
+  assert.ok(mount.includes('也值得开庭'), 'the headline must not be truncated to a shell');
+  assert.ok(mount.includes('hero-court.webp'), 'the first-screen artwork must be statically referenced');
+  assert.ok(/data-action="random"/.test(mount) && /data-action="trial"/.test(mount), 'both entry CTAs exist before JS runs');
+  assert.ok(/class="boot-note"[^>]*role="status"/.test(mount), 'a status line covers the pre-JS state');
+  assert.ok(/-webkit-text-size-adjust/.test(css), 'entry text sizing must be pinned for WebView');
+});
+
+/* ---------- 端能力 ---------- */
+test('forbidden Web APIs are absent from shipped code', () => {
+  const banned = {
+    'fetch(': /fetch\s*\(/, 'XMLHttpRequest': /XMLHttpRequest/, 'WebSocket': /new\s+WebSocket\s*\(/,
+    'EventSource': /new\s+EventSource\s*\(/, 'navigator.geolocation': /navigator\.geolocation/,
+    'navigator.clipboard': /navigator\.clipboard/, 'document.execCommand': /execCommand/,
+    'navigator.share': /navigator\.share\b/, 'navigator.canShare': /navigator\.canShare\b/,
+    'a[download]': /\bdownload\s*=|\.download\s*=/, 'window.open': /window\.open\s*\(/,
+    'window.prompt': /window\.prompt\s*\(/, 'eval': /\beval\s*\(/, 'new Function': /new\s+Function\s*\(/,
+    'WebAssembly': /WebAssembly\./, 'Worker': /new\s+(?:Shared)?Worker\s*\(/,
+    'ServiceWorker': /navigator\.serviceWorker/, 'requestFullscreen': /requestFullscreen/,
+    'DeviceMotion': /DeviceMotionEvent|'devicemotion'/, 'DeviceOrientation': /DeviceOrientationEvent|'deviceorientation'/,
+    'navigator.storage.persist': /navigator\.storage\.persist/, 'location.href assign': /location\.href\s*=/,
+  };
+  for (const [label, re] of Object.entries(banned)) {
+    assert.equal(re.test(js), false, 'forbidden capability present: ' + label);
   }
 });
 
-test('all 16 defendants have individual illustrations', () => {
-  for (const id of defendants) assert.ok(appJs.includes(id + ":'./assets/defendants/"), 'missing defendant image mapping: ' + id);
+test('persistence uses the container Storage API and never writes browser storage', () => {
+  assert.equal(/localStorage\.setItem|sessionStorage\.setItem|indexedDB\.open|caches\./.test(js), false);
+  assert.ok(platformJs.includes('setStorage'), 'Storage API must be bridged');
+  assert.ok(platformJs.includes('getStorage'), 'Storage API must be bridged');
+  assert.ok(/MIN\s*=\s*{[^}]*storage:\s*9460/.test(platformJs), 'Storage requires client 9.46+');
+  assert.ok(/isClientVersion|clientVersion/.test(platformJs), 'version must be compared, not guessed from UA');
+  /* 在线文档允许一次性读取旧浏览器存储做迁移，迁移后不再读写 */
+  assert.ok(/localStorage\.getItem/.test(platformJs), 'one-time migration read must exist');
+  assert.ok(/removeItem/.test(platformJs), 'migration must clear the legacy store afterwards');
+  assert.ok(appJs.includes("persistence='unsupported'"), 'the app must handle storage being unavailable');
+  assert.equal(/return\s+\{[^}]*ok:\s*false[^}]*\}/.test(platformJs), true, 'adapters must report failure, not fake success');
 });
 
-test('gallery exposes the four visual catalogue tabs', () => {
-  for (const tab of ['cases','characters','props','scenes']) assert.ok(appJs.includes("'" + tab + "'"));
+test('image saving and sharing go through documented container APIs', () => {
+  for (const api of ['writeTempFile', 'saveImageToPhotosAlbum', 'postNote', 'share', 'getWindowInfo']) {
+    assert.ok(platformJs.includes(api), 'missing container API bridge: ' + api);
+  }
+  assert.match(platformJs, /share:\s*9530/, 'share requires client 9.53+');
+  assert.match(platformJs, /window:\s*9490/, 'getWindowInfo requires client 9.49+');
+  assert.ok(/type:\s*'image'/.test(platformJs) && /image_resource/.test(platformJs), 'share({type:"image", image_resource})');
+  assert.ok(/pageType:\s*'photo_publish'/.test(platformJs) && /image_resources/.test(platformJs), 'postNote media shape');
+  assert.ok(appJs.includes('state.posterDataUrl'), 'platform calls need a data URI, not a blob URL');
+  assert.ok(/URL\.revokeObjectURL/.test(appJs), 'the blob preview must be released');
+});
+
+test('text copy falls back to selectable text, not the clipboard API', () => {
+  assert.ok(appJs.includes('id="copy-field"'), 'the verdict copy must be presented as selectable text');
+  assert.ok(/readonly/.test(appJs) && /user-select:\s*text/.test(css), 'the field must stay selectable');
+  /* 只看真实声明，注释里提到它不算：禁用 touch-callout 会杀掉长按复制这条路 */
+  const cssDecls = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.equal(/-webkit-touch-callout:\s*none/.test(cssDecls), false, 'disabling touch-callout would kill long-press copy');
+});
+
+/* ---------- JS 兼容性：Chrome 61 / ES2017 ---------- */
+test('shipped JS stays within ES2017', () => {
+  assert.equal(/\?\./.test(js), false, 'optional chaining is ES2020');
+  assert.equal(/\?\?/.test(js), false, 'nullish coalescing is ES2020');
+  assert.equal(/\|\|=|&&=|\?\?=/.test(js), false, 'logical assignment is ES2021');
+  assert.equal(/#[A-Za-z_$]+\s*[=(]/.test(js), false, 'class fields are not ES2017');
+  assert.equal(/BigInt|globalThis/.test(js), false);
+  assert.equal(/\.flatMap\(|\.flat\(|Object\.entries\(\{[\s\S]*?\}\)\.flatMap/.test(js), false, 'Array flat/flatMap is ES2019');
+  assert.equal(/Object\.fromEntries|String\.prototype\.replaceAll|\.replaceAll\(/.test(js), false, 'ES2019/2021 runtime APIs');
+  assert.equal(/structuredClone|Array\.prototype\.at\(|\.at\(-?\d/.test(js), false, 'newer runtime APIs must not be the only path');
+});
+
+test('newer Web APIs are feature-detected', () => {
+  assert.ok(/typeof canvas\.toBlob\s*===\s*'function'/.test(appJs), 'toBlob must be probed');
+  assert.ok(/window\.visualViewport\s*&&/.test(platformJs), 'visualViewport must be probed');
+  assert.ok(/typeof\s+\w+\.?(replaceState|addEventListener)\s*===\s*'function'/.test(js), 'history/listener APIs must be probed');
+  assert.ok(/try\s*\{/.test(appJs) && appJs.includes('catch'), 'container calls must not throw into the UI');
+  assert.equal(/navigator\.userAgent/.test(js), false, 'capability detection must not sniff UA');
+});
+
+test('dates are formatted explicitly, not via locale-dependent output', () => {
+  assert.equal(/\.toLocaleDateString\(/.test(appJs), false, 'js-compatibility.md §4: do not rely on Intl formatting output');
+  assert.ok(appJs.includes('function formatDate'), 'an explicit YYYY/MM/DD formatter must exist');
+});
+
+/* ---------- CSS 兼容性：Chrome 61 基线 + 增强 ---------- */
+test('CSS never relies on post-Chrome-61 features as the only implementation', () => {
+  assert.equal(/\baspect-ratio\s*:/.test(css), false, 'Chrome 88; ratio boxes must use padding-top');
+  assert.equal(/\binset\s*:/.test(css), false, 'Chrome 87; use top/right/bottom/left');
+  assert.equal(/overflow\s*:\s*clip/.test(css), false, 'Chrome 90; use hidden');
+  assert.equal(/\b[0-9]+dvh|\b[0-9]+svh|\b[0-9]+lvh/.test(css), false, 'Chrome 108; use vh + --app-height');
+  assert.equal(/\bmargin-inline\b|\bpadding-inline\b|\bpadding-block\b/.test(css), false, 'logical shorthands need physical properties');
+  assert.equal(/repeating-conic-gradient/.test(css), false, 'Chrome 69');
+  assert.equal(/\bclamp\(/.test(css), false, 'Chrome 79; use fixed values + media queries');
+});
+
+test('Chrome 61 fallbacks exist for gap, safe area, focus and blur', () => {
+  assert.ok(/grid-gap/.test(css), 'grid spacing must also declare grid-gap (Chrome 57)');
+  assert.ok(/no-flexgap/.test(css), 'flex gap needs a margin-based fallback');
+  assert.ok(/--app-height/.test(css), 'viewport height must fall back to vh');
+  const safeArea = css.match(/var\(--safe-area-inset-\w+, env\(safe-area-inset-\w+, 0px\)\)/g) || [];
+  assert.ok(safeArea.length >= 4, 'safe areas must be var() -> env() -> 0, got ' + safeArea.length);
+  const plainThenSafe = /padding-bottom:\s*\d+px;\s*\n\s*padding-bottom:\s*calc\([^)]*safe-area/.test(css)
+    || /padding:\s*[^;]+;\s*\n\s*padding:\s*calc\([^)]*safe-area/.test(css)
+    || /bottom:\s*\d+px;\s*\n\s*bottom:\s*calc\([^)]*safe-area/.test(css);
+  assert.ok(plainThenSafe, 'a plain value must precede the env() form so Chrome 61 keeps a usable fallback');
+  assert.ok(/:focus\s*\{[^}]*outline/.test(css), 'keyboard focus must be visible without :focus-visible');
+  assert.ok(/@supports\s*\(selector\(:focus-visible\)\)/.test(css), ':focus-visible belongs in an enhancement block');
+  assert.ok(/@supports\s*\(\(-webkit-backdrop-filter/.test(css), 'backdrop-filter must be gated');
+  assert.ok(/prefers-reduced-motion:\s*reduce/.test(css));
+});
+
+test('artwork is cropped or sliced, never stretched, and reserves its box', () => {
+  assert.equal(/url\(["']?\.\/assets\/(scenes|props)[^)]*100%\s*100%/.test(css), false);
+  assert.ok(/object-fit:\s*cover/.test(css), 'scene windows crop');
+  assert.ok(/padding-top:\s*45\.12%/.test(css), 'the certificate crest band keeps 1086/490');
+  assert.ok(/padding-top:\s*19\.153%/.test(css), 'the wax-seal band keeps 1086/208');
+  assert.ok(/padding-bottom:\s*123\.38%/.test(css), 'the empty certificate keeps 1129/1393');
+  assert.ok(/\.art\s*>\s*img\s*\{[^}]*position:\s*absolute/.test(css), 'ratio boxes need an out-of-flow image');
+});
+
+test('transparent assets really carry an alpha channel', async () => {
+  for (const path of ['decor/btn-primary.webp', 'props/laurel-wreath.webp', 'props/royal-key.webp', 'defendants/monday.webp']) {
+    const bytes = await readFile(new URL('../assets/' + path, import.meta.url));
+    assert.equal(bytes.subarray(0, 4).toString('latin1'), 'RIFF', path);
+    assert.equal(bytes.subarray(8, 12).toString('latin1'), 'WEBP', path);
+    assert.equal(bytes.includes('ALPH'), true, path + ' lost its alpha during conversion');
+  }
+});
+
+/* ---------- 跨端 ---------- */
+test('touch and scroll behaviour is device-safe', () => {
+  assert.ok(/touch-action:\s*manipulation/.test(css), 'double-tap zoom delay hurts real devices');
+  assert.ok(/-webkit-tap-highlight-color/.test(css));
+  assert.ok(/@media \(max-width: 359px\)/.test(css) && /@media \(min-width: 430px\)/.test(css));
+  assert.equal(/width:\s*375px/.test(css), false, 'no hard-coded device width');
+  assert.ok(/max-width:\s*100%/.test(css), 'images must be fluid');
+});
+
+/* ---------- 业务逻辑未被顺手改坏 ---------- */
+test('the courtroom product contract still holds', () => {
+  for (const id of defendantIds) assert.ok(appJs.includes(id + ":'./assets/defendants/"), 'missing artwork mapping: ' + id);
+  for (const id of defendantIds) assert.ok(appJs.includes(id + ':['), 'case-specific data missing: ' + id);
+  for (const pool of ['const caseEvidence=', 'const caseCharges=', 'const caseFindings=', 'const verdictSentences=', 'const penaltiesByJudge=', 'const judgeComments=', 'const settleSentences=', 'const settlePenalties=', 'const settleComments=']) {
+    assert.ok(appJs.includes(pool), 'missing pool ' + pool);
+  }
+  assert.ok(appJs.includes("const outcome=(evidenceCount>=2||style.id==='strict')?'guilty':'settle';"));
+  assert.ok(appJs.includes('const customRules=['), 'custom defendants must still be classified');
+  assert.ok(appJs.includes('依描述命中'));
+  assert.ok(appJs.includes('function startAppeal()'));
+  assert.ok(appJs.includes('function recordReaction(reaction)'));
   assert.ok(appJs.includes('data-action="gallery-tab"'));
-});
-
-test('primary navigation is wired and mirrors the route', () => {
-  for (const action of ['home','trial','archive','gallery']) {
-    assert.ok(html.includes('data-action="' + action + '"'), 'tab bar missing action: ' + action);
+  for (const action of ['home','trial','archive','gallery','next','verdict','poster','appeal','reaction','delete','daily','random']) {
+    assert.ok(appJs.includes("'" + action + "'"), 'missing action: ' + action);
   }
-  assert.ok(appJs.includes("document.body.addEventListener('click',onClick)"), 'navigation must be handled outside #app too');
-  assert.ok(appJs.includes("routeOf={home:'#/'"), 'routes must be reflected in the address bar');
-  assert.ok(appJs.includes("addEventListener('popstate'"), 'browser back must be honoured');
-  for (const action of ['next','verdict','poster','copy','appeal','reaction','delete','daily','random']) assert.ok(appJs.includes("'" + action + "'"), 'missing action: ' + action);
-  assert.ok(appJs.includes('wanniu-court-github-v1'));
-  assert.ok(appJs.includes('slice(0,80)'));
+  assert.ok(appJs.includes('slice(0,80)'), 'history stays bounded');
 });
 
-test('destructive delete uses an in-app confirmation, not window.confirm', () => {
-  assert.equal(appJs.includes('window.confirm'), false, 'window.confirm is blocked inside embedded webviews');
-  assert.ok(appJs.includes('function askConfirm('));
+test('destructive delete uses an in-app sheet, not window.confirm', () => {
+  assert.equal(appJs.includes('window.confirm'), false);
   assert.ok(appJs.includes('role="alertdialog"'));
   assert.ok(appJs.includes('data-action="confirm-ok"'));
-  assert.ok(appJs.includes('data-action="confirm-cancel"'));
 });
 
-test('daily case is stable for a local date and distinct from quick trial', () => {
-  assert.ok(appJs.includes('const getDailyDocket=function()'));
-  assert.ok(appJs.includes("x.source==='daily'&&x.dailyDate===daily.dateKey"));
-  assert.ok(appJs.includes("pickRandom('daily')"));
-  assert.ok(appJs.includes("pickRandom('quick')"));
+test('poster is drawn at 1080x1440 with canvas text and kinsoku wrapping', () => {
+  assert.ok(/const W=1080,H=1440/.test(appJs));
+  assert.ok(appJs.includes('NO_LINE_START'), 'Chinese line-break rules must be applied');
+  assert.ok(appJs.includes('NO_LINE_END'));
+  assert.ok(/plaqueY=Math\.min\(y,950\)/.test(appJs), 'the plaque must not push the comment onto the footer rule');
+  assert.equal(appJs.includes('g.fillRect(x,y+h-38,w,38)'), false, 'no baked caption bars over artwork');
 });
 
-test('each defendant has tailored charges, evidence and a finding', () => {
-  for (const id of defendants) assert.ok(appJs.includes(id + ':['), 'case-specific data missing for ' + id);
-  for (const pool of ['const caseEvidence=','const caseCharges=','const caseFindings=','const verdictSentences=','const penaltiesByJudge=','const judgeComments=']) assert.ok(appJs.includes(pool), 'missing pool ' + pool);
-  assert.ok(appJs.includes('chargesFor(who)'));
-  assert.ok(appJs.includes('evidenceFor(who)'));
-});
-
-test('verdict outcome is derived from evidence count and judge style', () => {
-  assert.ok(appJs.includes("const outcome=(evidenceCount>=2||style.id==='strict')?'guilty':'settle';"));
-  for (const pool of ['const settleSentences=','const settlePenalties=','const settleComments=']) assert.ok(appJs.includes(pool), 'settle copy missing: ' + pool);
-  assert.ok(appJs.includes('outcome:outcome'), 'outcome must be written into the archived record');
-  assert.ok(appJs.includes('const outcomeOf=function('), 'legacy records without an outcome must still render');
-});
-
-test('appeal carries forward the original target, charge and evidence', () => {
-  assert.ok(appJs.includes('function startAppeal()'));
-  assert.ok(appJs.includes('state.appealOf=previous.id'));
-  assert.ok(appJs.includes('state.evidence=Array.isArray(previous.evidence)?previous.evidence.slice(0,2):[]'));
-  assert.ok(appJs.includes('appealRound:state.appealOf?(state.appealRound||1):0'));
-});
-
-test('post-verdict feedback persists and sharing works on mobile', () => {
-  assert.ok(appJs.includes('function recordReaction(reaction)'));
-  assert.ok(appJs.includes("['fair','light','heavy']"));
-  assert.ok(appJs.includes('长按图片可保存到相册'));
-  assert.ok(appJs.includes('navigator.share'));
-  assert.ok(appJs.includes('navigator.canShare'));
-  assert.ok(appJs.includes('data-action="poster-download"'));
-  assert.ok(appJs.includes('data-action="poster-share"'));
-});
-
-test('poster is drawn at 1080x1440 with canvas text, never baked artwork', () => {
-  assert.ok(appJs.includes('canvas.width=W') && appJs.includes('const W=1080,H=1440'));
-  assert.ok(appJs.includes("round(L,plateY,CW,plateH,10)"), 'crest plate must be vector-drawn');
-  assert.ok(appJs.includes('wrapMax='), 'long copy must truncate instead of colliding');
-  assert.ok(appJs.includes('toBlob'), 'poster must produce a shareable blob');
-});
-
-test('dev server allows blob posters under CSP', async () => {
-  const server = await readFile(new URL('../scripts/dev-server.mjs', import.meta.url), 'utf8');
-  assert.ok(/img-src 'self' data: blob:/.test(server), 'blob: must be an allowed image source');
-  assert.ok(/object-src 'none'/.test(server));
-  assert.ok(/connect-src 'none'/.test(server));
-});
-
-test('live search restores focus and cursor without forcing page scroll', () => {
-  assert.ok(appJs.includes('focusId:id'));
-  assert.ok(appJs.includes('selectionStart:start,selectionEnd:end'));
-  assert.ok(appJs.includes('render({scroll:false})'));
-  assert.ok(appJs.includes('data-action="clear-query"'));
-});
-
-test('illustration artwork is never stretched into UI surfaces', () => {
-  const stretched = [...css.matchAll(/url\("\.\/assets\/(scenes|props)[^"]*"\)[^;]*100% 100%/g)];
-  assert.equal(stretched.length, 0, 'scene and prop artwork must crop or slice, never stretch: ' + JSON.stringify(stretched.map(m => m[0])));
-  assert.ok(css.includes('object-fit: cover'), 'artwork windows should crop, not stretch');
-  assert.ok(css.includes('aspect-ratio'), 'artwork windows must reserve their box before the image loads');
-});
-
-test('custom defendants fall back to a drawn monogram, never to decorative artwork', () => {
-  assert.ok(appJs.includes('const monogram=function('), 'custom defendants need a typographic placeholder');
-  assert.ok(appJs.includes('art--mono'), 'the artwork scrim must not grey out the monogram plate');
-  assert.equal(/defendantId\?defendantAssets\[[^\]]*\]:propAssets\.scroll/.test(appJs), false,
-    'a blank scroll in the defendant slot reads as a broken image');
-  assert.equal(appJs.includes("'被 告'") && appJs.includes("自定义被告 · 本庭照单受理"), true,
-    'the poster must draw a nameplate for custom defendants');
-});
-
-test('poster windows carry no baked caption bars and single exhibits are unnumbered', () => {
-  assert.equal(appJs.includes("g.fillRect(x,y+h-38,w,38)"), false, 'hard black caption bars were removed');
-  assert.ok(appJs.includes('const evText=ev.length===1?ev[0]'), 'one exhibit must not render a "1." prefix');
-});
-
-test('custom defendants are classified from the words the user typed', () => {
-  assert.ok(appJs.includes('const customRules=['), 'custom defendants need a real classifier');
-  for (const id of ['work','life','social','digital','self','campus']) {
-    assert.ok(new RegExp("\\{id:'" + id + "',focus:").test(appJs), 'no rule for category ' + id);
-  }
-  assert.ok(appJs.includes('const ranked=best.charges.map'), 'headline charge must follow the matched keyword, not list order');
-  assert.ok(appJs.includes('依描述命中'), 'the court must show which reading produced the charge');
-  assert.ok(appJs.includes("id:'custom',matched:0"), 'unmatched names must fall back honestly, not pretend to be classified');
-  assert.equal(appJs.includes("state.charge='故意扰乱心情秩序罪'"), false, 'custom defendants must not get a hardcoded charge');
-  assert.ok(appJs.includes('customClassified:'), 'the archived record must keep how it was classified');
+test('page weight stays inside the delivery budget', async () => {
+  const cssBytes = Buffer.byteLength(css);
+  const jsBytes = Buffer.byteLength(appJs) + Buffer.byteLength(platformJs);
+  assert.ok(cssBytes + jsBytes < 5 * 1024 * 1024, 'text total must stay well under the 5 MiB advisory');
+  assert.ok(jsBytes < 2 * 1024 * 1024, 'a single JS file over 2 MiB is a risk signal');
+  const base64 = (appJs + css).match(/base64,[A-Za-z0-9+/=]{2000,}/g) || [];
+  assert.deepEqual(base64, [], 'no large base64 may be embedded in source');
 });

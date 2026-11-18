@@ -1,18 +1,26 @@
 import { chromium } from 'playwright';
+import { mockInit, names } from './mock-container.mjs';
 const EXE='/Users/zand/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-x64/chrome-headless-shell';
 const b=await chromium.launch({executablePath:EXE});
 const ctx=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+/* 容器 JS API 测试替身：验证 Storage / 相册 / 分享 / 发笔记 的调用约定 */
+await ctx.addInitScript(mockInit);
 const p=await ctx.newPage();
 const errs=[]; p.on('pageerror',e=>errs.push('PAGEERROR '+e.message)); p.on('console',m=>m.type()==='error'&&errs.push('CONSOLE '+m.text()));
 let pass=0,fail=0;
 const t=(name,cond,extra)=>{ if(cond){pass++;console.log('  ok   '+name)} else {fail++;console.log('  FAIL '+name+(extra?'  -> '+extra:''))} };
-const go=async()=>{ await p.goto('http://127.0.0.1:4173',{waitUntil:'networkidle'}); await p.waitForTimeout(400); };
+const go=async()=>{ await p.goto('http://127.0.0.1:4173/dist/index.html',{waitUntil:'networkidle'}); await p.waitForTimeout(400); };
 const click=s=>p.click(s,{timeout:6000});
+/* 卷宗存在容器 Storage 里，不再存在 localStorage */
+const readArchive=()=>p.evaluate(()=>{
+  const raw=(window.__mock&&window.__mock.store.get('archive'))||'[]';
+  try{return JSON.parse(raw)}catch(e){return []}
+});
 const state=()=>p.evaluate(()=>({
   page:document.querySelector('#app > div > section, #app > div > article, #app > div > div')?.className||'',
   hash:location.hash,
   tabs:[...document.querySelectorAll('.tab-bar .tab')].map(x=>[x.dataset.action,x.classList.contains('is-on')]),
-  hist:JSON.parse(localStorage.getItem('wanniu-court-github-v1')||'[]').length,
+  hist:(()=>{const raw=(window.__mock&&window.__mock.store.get('archive'))||'[]';try{return JSON.parse(raw).length}catch(e){return 0}})(),
 }));
 
 await go();
@@ -82,7 +90,7 @@ t('history persisted', st1.hist===1, 'hist='+st1.hist);
 t('route is #/verdict', st1.hash==='#/verdict', st1.hash);
 // --- reaction persists
 await click('.reaction-grid button:nth-child(1)');
-const h0=JSON.parse(await p.evaluate(()=>localStorage.getItem('wanniu-court-github-v1')));
+const h0=await readArchive();
 t('reaction saved', h0[0].reaction==='fair', JSON.stringify(h0[0].reaction));
 t('outcome saved', ['guilty','settle'].includes(h0[0].outcome), h0[0].outcome);
 // --- poster
@@ -90,7 +98,25 @@ await click('[data-action="poster"]');
 await p.waitForTimeout(2200);
 t('sheet opens', await p.evaluate(()=>!document.getElementById('sheet').hidden));
 const posterOk=await p.evaluate(async()=>{ const im=document.querySelector('.sheet-figure img'); if(!im.complete||!im.naturalWidth) return 'no image'; return im.naturalWidth===1080&&im.naturalHeight===1440; });
+await click('.sheet [data-action="poster-save"]');
+await p.waitForTimeout(1200);
+await click('.sheet [data-action="poster-share"]');
+await p.waitForTimeout(1200);
+await p.keyboard.press('Escape');
+await p.waitForTimeout(300);
+await click('[data-action="note-publish"]');
+await p.waitForTimeout(1600);
 t('poster is 1080x1440', posterOk===true, String(posterOk));
+{
+  const calls = await p.evaluate(() => window.__mock.calls.map(c => ({ name: c.name, args: c.args })));
+  const save = calls.find(c => c.name === 'saveImageToPhotosAlbum');
+  const temp = calls.find(c => c.name === 'writeTempFile');
+  const share = calls.find(c => c.name === 'share');
+  const note = calls.find(c => c.name === 'postNote');
+  t('save goes writeTempFile -> saveImageToPhotosAlbum(filePath)', !!temp && !!save && save.args.filePath === '/mock/tmp/poster.png', JSON.stringify({ temp: !!temp, save: save && save.args }));
+  t('share uses the platform API with type=image', !!share && share.args.type === 'image' && !!share.args.image_resource, JSON.stringify(share && share.args));
+  t('postNote carries title/content/photo_publish + image_resources', !!note && note.args.pageType === 'photo_publish' && note.args.contentLength > 20, JSON.stringify(note && note.args));
+}
 await p.keyboard.press('Escape');
 t('escape closes sheet', await p.evaluate(()=>document.getElementById('sheet').hidden));
 // --- appeal keeps the case
@@ -105,7 +131,7 @@ await click('[data-action="confirm-cancel"]');
 t('cancel keeps record', await p.locator('.rec').count()>=1);
 await click('.rec-del'); await click('[data-action="confirm-ok"]');
 await p.waitForTimeout(300);
-t('delete empties archive', await p.evaluate(()=>JSON.parse(localStorage.getItem('wanniu-court-github-v1')||'[]').length)===0);
+t('delete empties archive', (await readArchive()).length === 0);
 t('empty state shown', await p.locator('.empty').count()===1);
 // --- search focus
 await click('.tab-bar [data-action="trial"]');
@@ -121,7 +147,7 @@ const d1=await p.locator('.daily h3').innerText();
 await click('.daily [data-action="daily"]');
 await p.waitForTimeout(5400);
 t('daily verdict produced', await p.locator('.doc').count()===1);
-const rec=await p.evaluate(()=>JSON.parse(localStorage.getItem('wanniu-court-github-v1'))[0]);
+const rec=(await readArchive())[0];
 t('daily tagged', rec.source==='daily', rec.source);
 t('daily defendant matches', rec.target===d1, rec.target+' vs '+d1);
 // --- gallery tabs

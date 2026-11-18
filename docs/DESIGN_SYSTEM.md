@@ -61,6 +61,20 @@ v1.5.0。这份规范里每一条“禁止”都对应一次真实的翻车，�
 
 **永远不要**用 `background-size: 100% 100%` 铺场景图或物件图。契约测试会拦住这件事。
 
+## 3.5 小工具容器约束
+
+产物是**离线 zip**，不是网站。以下不是建议，是容器强制：
+
+- **页面不能联网**：无 `fetch` / `XHR` / WebSocket / SSE / 外部图片字体脚本。52 张图全部进包。
+- **脚本必须是经典脚本**：`<script defer src>`，禁 `type="module"`、禁 `import`/`export`、禁顶层 await。多文件靠 `window` 命名空间与加载顺序（`platform.js` 先于 `app.js`）。
+- **禁内联脚本与行内事件**：`<script>...</script>`、`onclick="..."` 会被 CSP 拦掉。样式可以内联。
+- **最低基线 Chrome 61（Android 8.1 出厂 WebView）**：JS 上限 ES2017；CSS 用「61 基线层 + 能力检测增强层」，不维护两套完整样式表。
+- **禁用能力**：剪贴板（`navigator.clipboard` / `execCommand`）、`a[download]` 与 blob 下载、`navigator.geolocation`、传感器、Worker、`requestFullscreen`、`window.open` / `prompt`、`eval` / `new Function` / WASM、iframe。
+- **持久化只用容器 Storage**（9.46+）：`localStorage` / `IndexedDB` / Cookie / Cache API 都不许写；旧数据只允许一次性读出、写入 Storage 后清除。版本不足或接口缺失时返回 `false`，界面必须如实告知，不能假装已保存。
+- **保存图片走 `writeTempFile` → `saveImageToPhotosAlbum`**；分享走平台 `share`（9.53+）；发笔记走 `postNote`；安全区优先用 `getWindowInfo`（9.49+）换算出的 `--safe-area-inset-*`。
+- **复制文案改为可选中文本**：容器没有网页剪贴板，所以展示 `readonly textarea` 引导长按选中复制，并且**不设置 `-webkit-touch-callout: none`**，否则这条路也断了。
+- **体积**：zip 硬上限 10 MiB，建议 ≤2 MiB。仓库里的 `assets/` 是设计原图（13 MiB），交付走 `scripts/prepare-assets.py` 按显示尺寸 ×2 DPR 重导出，最终包 1.97 MiB。
+
 ## 4. 界面骨架
 
 移动优先，单列，`max-width: 520px` 居中，深色桌面背景衬托。

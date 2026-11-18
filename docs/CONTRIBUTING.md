@@ -9,19 +9,26 @@
 ## 本地运行
 
 ```bash
-npm run dev
+npm run dev      # http://127.0.0.1:4173  源码版（全尺寸图，方便调）
+npm run build    # dist/ + wanniu-court-minitool.zip（交付尺寸图）
+npm run audit    # skill 自带审计脚本扫 dist/
 ```
 
-默认地址为 `http://127.0.0.1:4173`。
+`http://127.0.0.1:4173/dist/index.html` 是打包后的产物，冒烟脚本默认打这个地址。
 
 ## 质量检查
 
 ```bash
-npm run check    # 52 张素材存在且接入界面
-npm test         # 22 项产品与视觉契约
+npm run check    # 52 张 WEBP 素材存在且接入界面 + 容器合规静态扫描
+npm test         # 20 项交付契约（入口结构 / 端能力 / ES2017 / Chrome 61 CSS / 业务规则）
+npm run build    # dist/ + wanniu-court-minitool.zip
+npm run audit    # skill 自带审计脚本扫 dist/，必须 0 error 0 warning
 ```
 
-提交前必须保证两条命令通过。契约测试覆盖内联脚本语法、移动端 viewport、远程资源约束、关键交互入口、本地历史边界，并且会**主动拦截**两类历史翻车：把场景/物件图 `background-size: 100% 100%` 铺成 UI 表面，以及把 `page-corners.webp` 整张拉伸。
+四条都要过。契约测试会**主动拦截**这几类翻车：内联脚本或 `type="module"`、外链资源、
+被禁端能力（剪贴板、`a[download]`、`navigator.share`、`localStorage` 写、Worker、
+`requestFullscreen`…）、ES2018+ 语法、把 `aspect-ratio` / `inset` / `dvh` / flex `gap`
+当作 Chrome 61 唯一实现、场景/物件图被 `100% 100%` 拉伸、透明素材在转码中丢掉 alpha。
 
 端到端与视觉复核（需要 Playwright，见 [tools/README.md](../tools/README.md)）：
 
@@ -35,6 +42,10 @@ node tools/poster.mjs   # 导出 1080x1440 海报原图
 
 ## 代码约束
 
+- 交付物是**离线 zip**：不得出现任何外链资源、`fetch` / XHR / WebSocket / SSE
+- 脚本只能是经典脚本（无 `type="module"`、无 `import`/`export`、无顶层 await），且不得有内联脚本或行内事件
+- JS 上限 ES2017；CSS 必须保证 Chrome 61 基线可用，新特性只作为 `@supports` / 实测检测后的增强
+- 持久化只走容器 Storage，禁止写 `localStorage` / `IndexedDB` / Cookie / Cache API；能力缺失要如实反馈，不得谎报已保存
 - 领域逻辑必须保持纯函数，随机源和当前时间要能注入
 - DOM 事件统一使用委托，避免重复绑定
 - 所有用户输入进入 HTML 前必须转义

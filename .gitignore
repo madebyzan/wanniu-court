@@ -5,7 +5,14 @@
 node_modules/
 pnpm-lock.yaml
 
-# visual-verification output from tools/ (regenerate with `node tools/shoot3.mjs`)
+# build output: regenerate with `npm run build`
+dist/
+wanniu-court-minitool.zip
+
+# the downloaded skill package (re-fetchable)
+.codex/minitool-zip-builder/
+
+# visual-verification output from tools/ (regenerate with `node tools/tour.mjs`)
 tools/out/
 shots*/
 

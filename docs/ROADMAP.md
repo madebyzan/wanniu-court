@@ -30,9 +30,29 @@
 - [x] 修复浮动操作条压住「被告名称」输入框（669px 视口下实测重叠 51px）：面板展开时操作条让位 + 显式滚动到视口中央
 - [x] 展开指示符由「右箭头旋转 90°」（看着像下载）改为「+ 旋转成 ×」；判决操作区由三种按钮权重简化为一主三辅
 
+## v1.6.0 · 小工具离线包（已完成）
+
+按 `.codex/minitool-zip-builder`（v1.11.1，在线文档 2026-11-13 已核验）改写并打包：
+
+- [x] 52 张图按显示尺寸 ×2 DPR 重导出为交付件（13 MiB 源图 → 包内 1.92 MiB），仓库原图不动
+- [x] `index.html` 改为容器规范入口：经典 `defer` 脚本、无内联脚本/行内事件、无 `<base>`、无外链
+- [x] 静态首屏：禁用 JS 时标题、主文案、两个入口 CTA、抬头图仍然可读，整页正好一屏不跳动
+- [x] 新增 `platform.js` 端能力适配层：版本判断（不猜 UA）、Storage、writeTempFile、saveImageToPhotosAlbum、share、postNote、getWindowInfo 安全区
+- [x] 移除全部禁用能力：`localStorage` 写、`navigator.clipboard`、`execCommand`、`a[download]`、`navigator.share`
+- [x] 复制文案改为可选中文本面板（容器无网页剪贴板），并保留长按选中所需的可选择状态
+- [x] JS 收到 ES2017：无 `?.` / `??` / 对象 spread / `flatMap` / `Object.fromEntries` / `structuredClone`；日期不再依赖 `toLocaleDateString` 输出
+- [x] CSS 建 Chrome 61 基线层：`aspect-ratio`→padding-top 比例盒、`inset`→物理属性、`overflow:clip`→hidden、`dvh`→`vh + --app-height`、逻辑属性→物理、`grid-gap` 双写、flex `gap` 用实测检测后加 `html.no-flexgap` margin 兜底、`:focus-visible` / `backdrop-filter` 收进 `@supports`、安全区 `var(--x, env(x, 0))` 且前面保留普通值
+- [x] 修复比例盒图片仍在流内导致的撑破（判决书装饰带实测 1.78 → 0.4512，与源图 1086/490 精确一致）
+- [x] 契约测试 22 项；端到端 57 项，其中含容器调用约定断言（`getLaunchOptions` / `setStorage` 序列化 / `writeTempFile`→`saveImageToPhotosAlbum(filePath)` / `share({type:'image'})` / `postNote` 的 `mediaInfo.image_resources`）
+- [x] 两个审计脚本（Node + Python）对 `dist/` 与最终 zip 均 PASS、0 warning；产物 `wanniu-court-minitool.zip` 1.97 MiB
+
 ## 下一轮验收
 
-- [ ] 真机 + 小红书内置浏览器：海报长按保存、系统文件分享、剪贴板降级路径
+- [ ] **创服平台模拟器**：上传 `wanniu-court-minitool.zip`，完成完整功能验证
+- [ ] **Android 真机扫码**：重点验 Chrome 61 基线层的间距/比例盒、Storage 读写、相册保存与分享面板
+- [ ] **iOS 真机扫码**：同一产物，验安全区与增强层
+- [ ] 低版本客户端（<9.46）下的降级文案：本机缓存不可用时界面是否说得清楚
+- [ ] 客户端 9.53 以下：分享入口是否正确隐藏；9.49 以下：相册保存与安全区降级
 - [ ] 52 张素材在不同屏幕比例下的裁切焦点与透明边缘人工复核
 - [ ] 每日案件、证据与判决句库根据真实试玩反馈迭代（当前 16 被告 × 3 罪名 × 3 证据）
 - [ ] 键盘-only 全流程走查（当前已验证焦点可见与 Esc 关闭，未做完整 Tab 序审计）

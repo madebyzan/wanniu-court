@@ -1,4 +1,10 @@
-const judgePortrait = './assets/characters/judge-pigeon.webp';
+/* 万物审判庭 · 应用层
+   经典脚本（容器 CSP 不允许 type="module"），依赖 platform.js 先执行。
+   语法上限 ES2017，目标 Chrome 61。 */
+(function () {
+  'use strict';
+
+  var judgePortrait = './assets/characters/judge-pigeon.webp';
     const sceneAssets = {hero:'./assets/scenes/hero-court.webp',hall:'./assets/scenes/case-hall.webp',filing:'./assets/scenes/filing-hall.webp',deliberation:'./assets/scenes/deliberation-room.webp',archive:'./assets/scenes/archive-room.webp',verdict:'./assets/scenes/verdict-paper.webp'};
     const characterAssets = {judge:'./assets/characters/judge-pigeon.webp',cat:'./assets/characters/cat-lawyer.webp',frog:'./assets/characters/frog-clerk.webp',hamster:'./assets/characters/hamster-archivist.webp',hedgehog:'./assets/characters/hedgehog-bailiff.webp',rabbit:'./assets/characters/rabbit-witness.webp'};
     const propAssets = {folder:'./assets/props/case-folder.webp',column:'./assets/props/court-column.webp',crown:'./assets/props/crown.webp',envelope:'./assets/props/evidence-envelope.webp',gavel:'./assets/props/gavel.webp',hourglass:'./assets/props/hourglass.webp',laurel:'./assets/props/laurel-wreath.webp',magnifier:'./assets/props/magnifier.webp',watch:'./assets/props/pocket-watch.webp',quill:'./assets/props/quill.webp',candlestick:'./assets/props/royal-candlestick.webp',key:'./assets/props/royal-key.webp',scroll:'./assets/props/royal-scroll.webp',seal:'./assets/props/royal-seal.webp',shield:'./assets/props/royal-shield.webp',scales:'./assets/props/scales.webp'};
@@ -215,13 +221,56 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
     const sentencePool = ['有期徒刑 365 天','强制静音 30 天','罚没 1000 快乐币','责令公开道歉 3 次','暂停营业一个周末','强制整改至人类满意为止'];
     const judgeStyles = [{id:'strict',name:'铁面无私型',intro:'证据不足？那就再找一条。',seal:'公'},{id:'soft',name:'看似温柔型',intro:'语气温和，判罚不轻。',seal:'审'},{id:'chaos',name:'混沌随机型',intro:'判决结果连书记员都想不到。',seal:'判'}];
     const storeKey='wanniu-court-github-v1';
-    let state={page:'home',step:1,category:'all',query:'',target:null,charge:'',evidence:[],judge:'strict',history:[],result:null,customOpen:false,custom:'',galleryTab:'cases',archiveTab:'all',caseMode:'manual',appealOf:null,appealRound:0,posterBlob:null,posterUrl:null,posterFilename:''};
-    try{const stored=JSON.parse(localStorage.getItem(storeKey)||'[]');state.history=Array.isArray(stored)?stored.slice(0,80):[]}catch(e){state.history=[]}
+    function formatDate(d){
+      /* 不依赖 toLocaleDateString：各内核对 zh-CN 的拼接结果不一致 */
+      return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+    }
+    let state={page:'home',step:1,category:'all',query:'',target:null,charge:'',evidence:[],judge:'strict',history:[],result:null,customOpen:false,custom:'',galleryTab:'cases',archiveTab:'all',caseMode:'manual',appealOf:null,appealRound:0,posterBlob:null,posterUrl:null,posterDataUrl:null};
+    /* 持久化只用容器 Storage（9.46+）。版本不足或接口缺失时返回 false，
+       不回退 localStorage / IndexedDB / Cookie；调用方必须处理失败并如实告知用户。
+       旧版本留在浏览器存储里的卷宗做一次性迁移，迁移后不再读写。 */
+    var persistence='checking';
+    function adoptHistory(raw){
+      let parsed;
+      try{parsed=JSON.parse(raw||'[]')}catch(e){parsed=[]}
+      state.history=Array.isArray(parsed)?parsed.slice(0,80):[];
+      if(state.result){
+        const again=state.history.find(function(x){return x.id===state.result.id});
+        if(again)state.result=again;
+      }
+    }
+    function loadHistory(){
+      if(!window.CourtPlatform){persistence='unsupported';render({scroll:false});return}
+      window.CourtPlatform.storageGet().then(function(result){
+        if(!result.ok){
+          persistence='unsupported';
+          const legacy=window.CourtPlatform.readLegacy();
+          if(legacy)adoptHistory(legacy);
+          render({scroll:false});
+          showToast(legacy?'已读取旧卷宗，但本机缓存不可用，本次记录不会保存':'本机缓存不可用，判决只保留在本次打开');
+          return;
+        }
+        persistence='ok';
+        adoptHistory(result.data);
+        /* 一次性迁移：把旧浏览器存储写入 Storage，之后不再读写它 */
+        if(result.from==='empty'){
+          const legacy=window.CourtPlatform.readLegacy();
+          if(legacy&&legacy!=='[]')window.CourtPlatform.storageSet(legacy);
+        }
+        render({scroll:false});
+      });
+    }
     const app=document.getElementById('app');
     const esc=function(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
     const catName=function(id){const c=categories.find(x=>x.id===id);return c?c.label:'自定义案件'};
     const showToast=function(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('is-on');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>el.classList.remove('is-on'),2400)};
-    const save=function(){try{localStorage.setItem(storeKey,JSON.stringify(state.history.slice(0,80)))}catch(e){}};
+    const save=function(){
+      const payload=JSON.stringify(state.history.slice(0,80));
+      if(!window.CourtPlatform||persistence==='unsupported')return;
+      window.CourtPlatform.storageSet(payload).then(function(ok){
+        if(!ok){persistence='unsupported';showToast('本机存储不可用，本次判决只保留在当前页面')}
+      });
+    };
 
 /* ==========================================================================
    Presentation layer
@@ -245,7 +294,16 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
     /* ---------- routes ---------- */
     const routeOf={home:'#/',trial:'#/trial',processing:'#/trial',result:'#/verdict',archive:'#/archive',gallery:'#/gallery'};
     let routing=false;
-    function syncHash(){const want=routeOf[state.page]||'#/';if(window.location.hash!==want){routing=true;history.replaceState(null,'',want);routing=false}}
+    function syncHash(){
+      const want=routeOf[state.page]||'#/';
+      if(window.location.hash===want)return;
+      routing=true;
+      try{
+        if(history&&typeof history.replaceState==='function')history.replaceState(null,'',want);
+        else window.location.hash=want;
+      }catch(error){/* 离线包引擎可能限制 history：路由退化为纯内存状态，不影响使用 */}
+      routing=false;
+    }
     function pageFromHash(hash){
       if(hash==='#/trial')return 'trial';
       if(hash==='#/archive')return 'archive';
@@ -556,9 +614,9 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
       '</section>'+
       '<div class="action-grid">'+
         '<button class="btn btn--solid" data-action="poster">'+icon('share')+'<span>判决海报</span></button>'+
-        '<button class="btn btn--ghost" data-action="copy">'+icon('copy')+'<span>复制文案</span></button>'+
+        '<button class="btn btn--ink" data-action="note-publish">'+icon('quill')+'<span>发布笔记</span></button>'+
+        '<button class="btn btn--ghost" data-action="verdict-text">'+icon('copy')+'<span>判决文案</span></button>'+
         '<button class="btn btn--ghost" data-action="appeal">'+icon('retry')+'<span>申请再审</span></button>'+
-        '<button class="btn btn--ghost" data-action="archive">'+icon('archive')+'<span>我的卷宗</span></button>'+
       '</div>'+
       '</div>';
     }
@@ -574,7 +632,9 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
         '<div class="screen" style="padding-bottom:0"><span class="band"><img src="'+sceneAssets.archive+'" alt="复古木刻风格的档案室"><span class="band-tag">档案只存在这台设备的浏览器里</span></span>'+
         '<span class="eyebrow">Your Records</span>'+
         '<h2 class="display">我的卷宗。</h2>'+
-        '<p class="lede">每一次不爽，都有一份正式记录。卷宗只存在这台设备的浏览器里。</p></div>'+
+        '<p class="lede">每一次不爽，都有一份正式记录。'+(persistence==='unsupported'
+          ?'当前环境拿不到本地缓存，这份卷宗只保留在本次打开里。'
+          :'卷宗存在本机的小工具缓存里，不联网、不上传。')+'</p></div>'+
         (all.length?'<div class="tabs">'+tabs.map(function(t){
           return '<button class="'+(state.archiveTab===t.id?'is-on':'')+'" data-action="archive-tab" data-id="'+t.id+'">'+t.label+'<span class="n">'+t.n+'</span></button>';
         }).join('')+'</div>':'')+
@@ -594,10 +654,11 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
             '<button class="rec-del" data-action="delete" data-id="'+esc(x.id)+'" aria-label="删除 '+esc(x.target||'案件')+' 的卷宗">'+icon('trash')+'</button>'+
           '</article>';
         }).join('')+'</div>':
-        '<div class="empty"><span class="art art--cut art--paper"><img src="'+characterAssets.hamster+'" alt="仓鼠档案管理员"></span>'+
+        '<div class="empty"><div class="empty-inner">'+
+          '<span class="art art--cut art--paper"><img src="'+characterAssets.hamster+'" alt="仓鼠档案管理员"></span>'+
           '<strong>'+(all.length?'这个分类下还没有卷宗':'档案室还是空的')+'</strong>'+
           '<p>'+(all.length?'换一个筛选条件看看，或者去开一庭新的。':'第一份判决书还没诞生。带一件生活小事来，本庭给你一份正式记录。')+'</p>'+
-          '<button class="btn btn--solid" data-action="trial">开始第一次审判'+icon('arrow')+'</button></div>')+
+          '<button class="btn btn--solid" data-action="trial">开始第一次审判'+icon('arrow')+'</button></div></div>')+
         '</div>';
     }
     function shortDate(d){
@@ -652,7 +713,7 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
             '<div class="meta"><small>'+esc(catName(d.category))+'</small><strong>'+esc(d.title)+'</strong><span>'+esc(d.subtitle)+'</span></div>'+
             '<button class="chip" data-action="select-case" data-id="'+d.id+'">起诉'+icon('plus')+'</button></article>';
         }).join('')+'</div>':
-        '<div class="empty"><strong>图鉴里没有这位</strong><p>换个关键词，或者去立案时把它写成自定义被告。</p></div>')+tail();
+        '<div class="empty"><div class="empty-inner"><strong>图鉴里没有这位</strong><p>换个关键词，或者去立案时把它写成自定义被告。</p></div></div>')+tail();
     }
     function tail(){
       return '<div class="colophon"><span>Hand-drawn woodcut set</span><span>52 assets</span><span>Local only</span></div>';
@@ -704,7 +765,7 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
       const comment=outcome==='guilty'?pickOne(judgeComments[style.id]||judgeComments.strict):pickOne(settleComments[style.id]||settleComments.strict);
       const item={
         id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
-        date:new Date().toLocaleDateString('zh-CN'),
+        date:formatDate(new Date()),
         docket:'（'+new Date().getFullYear()+'）万审字第'+String(Math.floor(Math.random()*8999)+1000)+'号',
         target:target?target.title:state.custom,defendantId:target?target.id:null,category:category,
         mark:target?target.mark:'诉',charge:state.charge,evidence:state.evidence.slice(0,2),
@@ -946,37 +1007,59 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
       g.strokeStyle='#c4a77c';g.lineWidth=1;g.beginPath();g.moveTo(L,H-96);g.lineTo(R,H-96);g.stroke();
       text('纯属娱乐，不具法律效力  ·  Court of Every Little Thing',cx,H-60,'19px '+SANS,'#907958','center');
 
-      let blob=null;
-      try{blob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/png')})}catch(error){blob=null}
-      if(!blob){showToast('图片生成失败，已改用下载方式');try{downloadCanvas(canvas,v)}catch(e){}return}
-      if(state.posterUrl)URL.revokeObjectURL(state.posterUrl);
-      state.posterBlob=blob;state.posterUrl=URL.createObjectURL(blob);
-      state.posterFilename='万物审判庭-'+String(v.docket||'判决书').replace(/[（）()\s]/g,'')+'.webp';
-      openSheet();
+      /* 容器禁 a[download] / blob 下载，保存图片只能用 saveImageToPhotosAlbum。
+         预览允许 blob:（容器 CSP 明确放行内存图片），但平台接口需要 data URI，
+         所以两种编码都留：预览用 blob 省内存，交付用 dataURL 走端能力。 */
+      state.posterDataUrl=null;
+      try{state.posterDataUrl=canvas.toDataURL('image/png')}catch(error){state.posterDataUrl=null}
+      if(!state.posterDataUrl){showToast('海报生成失败，请重试');return}
+      if(state.posterUrl){URL.revokeObjectURL(state.posterUrl);state.posterUrl=null}
+      if(typeof canvas.toBlob==='function'&&typeof URL!=='undefined'&&URL.createObjectURL){
+        try{
+          state.posterBlob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/png')});
+          if(state.posterBlob)state.posterUrl=URL.createObjectURL(state.posterBlob);
+        }catch(error){state.posterBlob=null}
+      }
+      openPosterSheet();
     }
-    function downloadCanvas(canvas,v){
-      const anchor=document.createElement('a');
-      anchor.href=canvas.toDataURL('image/png');
-      anchor.download='万物审判庭-'+String(v.docket||'判决书').replace(/[（）()\s]/g,'')+'.webp';
-      document.body.appendChild(anchor);anchor.click();anchor.remove();
-    }
-    function openSheet(){
-      if(!state.posterUrl)return;
+
+    function posterPreviewSrc(){return state.posterUrl||state.posterDataUrl||''}
+
+    function openPosterSheet(){
+      const src=posterPreviewSrc();
+      if(!src)return;
       sheetEl.innerHTML='<div class="sheet-panel" role="dialog" aria-modal="true" aria-label="判决海报预览">'+
-        '<div class="sheet-hd"><h3>判决海报已就绪</h3><button class="x" data-action="poster-close" aria-label="关闭预览">'+icon('close')+'</button></div>'+
-        '<div class="sheet-figure"><img src="'+state.posterUrl+'" alt="3:4 判决海报预览"></div>'+
-        '<p class="sheet-tip">长按图片可保存到相册；也可以直接下载原图或调用系统分享。</p>'+
+        '<div class="sheet-hd"><h3>判决海报已就绪</h3><button class="x" data-action="sheet-close" aria-label="关闭预览">'+icon('close')+'</button></div>'+
+        '<div class="sheet-figure"><img src="'+src+'" alt="3:4 判决海报预览"></div>'+
+        '<p class="sheet-tip">海报由 Canvas 现绘，文字未烘焙进底图。可保存到相册，或直接发成笔记。</p>'+
         '<div class="sheet-actions">'+
-          '<button class="btn btn--solid" data-action="poster-download">'+icon('download')+'<span>下载原图</span></button>'+
-          '<button class="btn btn--ink" data-action="poster-share">'+icon('share')+'<span>系统分享</span></button>'+
+          '<button class="btn btn--solid" data-action="poster-save">'+icon('download')+'<span>保存到相册</span></button>'+
+          '<button class="btn btn--ink" data-action="poster-share">'+icon('share')+'<span>分享图片</span></button>'+
         '</div>'+
-        '<button class="btn btn--ghost btn--block" data-action="poster-close">返回判决</button>'+
+        '<button class="btn btn--ghost btn--block" data-action="sheet-close">返回判决</button>'+
       '</div>';
       sheetEl.hidden=false;
       document.body.style.overflow='hidden';
       const first=sheetEl.querySelector('.x');if(first)first.focus();
     }
-    let confirmAction=null;
+
+    function openTextSheet(){
+      if(!state.result)return;
+      const content=verdictCopy(state.result);
+      sheetEl.innerHTML='<div class="sheet-panel" role="dialog" aria-modal="true" aria-label="判决文案">'+
+        '<div class="sheet-hd"><h3>判决文案</h3><button class="x" data-action="sheet-close" aria-label="关闭">'+icon('close')+'</button></div>'+
+        '<div class="field"><label for="copy-field">容器内不提供网页剪贴板，请长按选中下方文字后手动复制</label>'+
+        '<textarea id="copy-field" rows="8" readonly spellcheck="false">'+esc(content)+'</textarea></div>'+
+        '<div class="sheet-actions">'+
+          '<button class="btn btn--solid" data-action="note-publish">'+icon('share')+'<span>直接发笔记</span></button>'+
+          '<button class="btn btn--ghost" data-action="sheet-close">关闭</button>'+
+        '</div>'+
+      '</div>';
+      sheetEl.hidden=false;
+      document.body.style.overflow='hidden';
+      const field=sheetEl.querySelector('#copy-field');if(field)field.focus();
+    }
+
     function askConfirm(title,body,onOk){
       confirmAction=onOk;
       sheetEl.innerHTML='<div class="sheet-panel" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">'+
@@ -990,24 +1073,17 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
       document.body.style.overflow='hidden';
       const ok=sheetEl.querySelector('[data-action="confirm-ok"]');if(ok)ok.focus();
     }
+    let confirmAction=null;
     function closeSheet(){
       sheetEl.hidden=true;sheetEl.innerHTML='';
       document.body.style.overflow='';
-      if(state.posterUrl){URL.revokeObjectURL(state.posterUrl);state.posterUrl=null;state.posterBlob=null}
+      if(state.posterUrl){URL.revokeObjectURL(state.posterUrl);state.posterUrl=null}
+      state.posterBlob=null;
       confirmAction=null;
     }
-    async function sharePoster(){
-      if(!state.posterBlob){showToast('请先生成判决海报');return}
-      if(typeof File==='undefined'||!navigator.share){showToast('当前环境不支持系统分享，请长按预览图保存');return}
-      const file=new File([state.posterBlob],state.posterFilename,{type:'image/png'});
-      if(navigator.canShare&&!navigator.canShare({files:[file]})){showToast('当前环境不支持分享图片，请长按预览图保存');return}
-      try{await navigator.share({files:[file],title:'我的万物审判庭判决',text:'我把这件生活小事告上了万物审判庭。你觉得判得合理吗？'})}
-      catch(error){if(error&&error.name!=='AbortError')showToast('系统分享暂不可用，请长按预览图保存')}
-    }
-    async function copyVerdictText(){
-      if(!state.result)return;
-      const v=state.result;
-      const content=[
+
+    function verdictCopy(v){
+      return [
         '我把「'+v.target+'」告上了万物审判庭！',
         '罪名：'+v.charge,
         (outcomeOf(v)==='guilty'?'判决：':'和解：')+v.sentence,
@@ -1015,11 +1091,42 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
         '你觉得判得合理吗？','',
         '#万物审判庭 #生活吐槽 #今日判决'
       ].join('\n');
-      try{await navigator.clipboard.writeText(content);showToast('小红书分享文案已复制')}
-      catch(error){
-        const textarea=document.createElement('textarea');textarea.value=content;textarea.setAttribute('readonly','');textarea.style.position='fixed';textarea.style.opacity='0';document.body.appendChild(textarea);textarea.select();
-        const copied=document.execCommand&&document.execCommand('copy');textarea.remove();showToast(copied?'小红书分享文案已复制':'复制失败，请长按选择文案');
-      }
+    }
+
+    /* 端能力调用统一走 CourtPlatform；不可用时给出明确原因，不静默降级成
+       浏览器 API，也不谎报成功。 */
+    function platformOnly(){return !!(window.xhs&&window.xhs.miniTool)}
+
+    async function savePoster(){
+      if(!state.result)return;
+      if(!state.posterDataUrl){await poster();}
+      if(!state.posterDataUrl){showToast('海报还没生成，请重试');return}
+      if(!platformOnly()){showToast('当前环境不支持保存到相册');return}
+      showToast('正在保存到相册…');
+      const result=await window.CourtPlatform.saveImage(state.posterDataUrl);
+      showToast(result.ok?'已保存到相册':result.reason==='unsupported'?'当前客户端版本不支持保存相册':'保存未完成，可能未授权访问相册');
+    }
+    async function sharePoster(){
+      if(!state.result)return;
+      if(!state.posterDataUrl)await poster();
+      if(!state.posterDataUrl){showToast('海报还没生成，请重试');return}
+      if(!platformOnly()){showToast('当前环境不支持分享');return}
+      const result=await window.CourtPlatform.shareImage(state.posterDataUrl);
+      if(!result.ok&&result.reason!=='cancelled')showToast(result.reason==='unsupported'?'分享需要客户端 9.53 及以上':'未能发起分享');
+    }
+    async function publishNote(){
+      if(!state.result)return;
+      if(!platformOnly()){showToast('发布笔记需要在小红书 App 内打开');return}
+      if(!window.CourtPlatform.has('postNote')){showToast('当前客户端不支持发布笔记');return}
+      if(!state.posterDataUrl)await poster();
+      const v=state.result;
+      showToast('正在打开发布页…');
+      const result=await window.CourtPlatform.publishNote({
+        title:'我把'+v.target+'告上了审判庭',
+        content:verdictCopy(v),
+        dataUrl:state.posterDataUrl
+      });
+      if(!result.ok)showToast(result.reason==='unsupported'?'当前客户端不支持发布笔记':'已取消发布');
     }
 
     /* ---------- events ---------- */
@@ -1081,14 +1188,11 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
       else if(action==='appeal')startAppeal();
       else if(action==='reaction')recordReaction(id);
       else if(action==='poster')poster();
-      else if(action==='poster-download'){
-        if(!state.posterUrl){showToast('请先生成判决海报');return}
-        const anchor=document.createElement('a');anchor.href=state.posterUrl;anchor.download=state.posterFilename;document.body.appendChild(anchor);anchor.click();anchor.remove();
-        showToast('图片下载已发起；手机浏览器也可以长按预览图保存');
-      }
+      else if(action==='poster-save')savePoster();
+      else if(action==='note-publish')publishNote();
+      else if(action==='verdict-text')openTextSheet();
       else if(action==='poster-share')sharePoster();
-      else if(action==='poster-close')closeSheet();
-      else if(action==='copy')copyVerdictText();
+      else if(action==='sheet-close')closeSheet();
       else if(action==='open-verdict'){
         const item=state.history.find(function(record){return record.id===id});
         if(item){state.result=item;state.page='result';render()}
@@ -1111,7 +1215,7 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
       if(button.closest('.sheet')){
         if(action==='confirm-ok'){const fn=confirmAction;closeSheet();if(fn)fn();return}
         if(action==='confirm-cancel'){closeSheet();return}
-        if(['poster-close','poster-download','poster-share'].includes(action)){e.preventDefault();handle(action,button.dataset.id,button)}
+        if(['sheet-close','poster-save','poster-share','note-publish'].includes(action)){e.preventDefault();handle(action,button.dataset.id,button)}
         return;
       }
       e.preventDefault();
@@ -1120,3 +1224,5 @@ const judgePortrait = './assets/characters/judge-pigeon.webp';
     document.body.addEventListener('click',onClick);
 
     render();
+    loadHistory();
+})();

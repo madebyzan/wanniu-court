@@ -1,6 +1,6 @@
 # 万物审判庭
 
-**v1.5.0 · 完整产品版**
+**v1.6.0 · 小工具离线包版**
 
 把日常里的小烦恼，送进一间认真得有点荒唐的复古法庭。选一个被告，提交指控，等法官给你一个交代。
 
@@ -31,28 +31,45 @@
 
 界面文字、按钮状态、卡片、印章、分隔线全部由 HTML/CSS/SVG 渲染，因此在任何分辨率下都是清晰的。
 
+## 交付形态
+
+本项目以**小红书小工具离线 zip** 交付：`index.html` 是包内唯一入口，52 张图与全部脚本打进包里，页面不联网。运行在受限容器内，因此：
+
+- 脚本是经典脚本 —— 无 `type="module"`、无内联 `<script>`、无行内事件
+- JS 上限 ES2017；CSS 以 **Chrome 61**（Android 8.1 出厂 WebView）为基线，新特性只作 `@supports` / 实测检测后的增强
+- 持久化只用容器 Storage（9.46+），不写 `localStorage`；拿不到缓存时界面如实说明，不谎报已保存
+- 保存图片走 `writeTempFile` → `saveImageToPhotosAlbum`；分享走平台 `share`（9.53+）；发笔记走 `postNote`；安全区优先用 `getWindowInfo`（9.49+）换算
+- 容器没有网页剪贴板，所以「判决文案」是**可选中文本**，引导长按选中复制
+
+产物：**`wanniu-court-minitool.zip` — 1.97 MiB**（硬上限 10 MiB，建议 ≤2 MiB）。
+仓库里的 `assets/` 是设计原图（13 MiB），交付时由 `scripts/prepare-assets.py` 按显示尺寸
+×2 DPR 重导出到 `dist/assets/`，原图不进包。
+
 ## 开发
 
 Node.js 20+，产品运行时零第三方依赖。
 
 ```bash
-npm run dev      # http://127.0.0.1:4173
-npm run check    # 校验 52 张素材存在且已接入界面
-npm test         # 22 项产品与视觉契约测试
+npm run dev      # http://127.0.0.1:4173   源码版（全尺寸图，方便调）
+npm run check    # 52 张素材 + 容器合规静态扫描
+npm test         # 20 项交付契约
+npm run build    # dist/ + wanniu-court-minitool.zip
+npm run audit    # skill 审计脚本扫 dist/，必须 0 error 0 warning
 ```
 
-需要跑端到端校验和截图复核时，见 [tools/README.md](tools/README.md)：
+端到端与视觉复核（需要 Playwright，见 [tools/README.md](tools/README.md)）：
 
 ```bash
-node tools/verify.mjs   # 54 项端到端断言
-node tools/custom.mjs   # 抽查自定义被告的归类与判决是否名副其实
+npm run verify   # 57 项端到端断言，含容器调用约定（带 mock）
+npm run smoke    # 对 dist 产物冒烟：静态首屏、判决书比例带、包外请求计数
 node tools/gaps.mjs     # 逐屏量间距，报重叠/过紧/过松/边距不齐
 node tools/detail.mjs   # 逐组件出图，人工复核细节
-node tools/tour.mjs     # 全界面截图
+node tools/custom.mjs   # 抽查自定义被告的归类与判决是否名副其实
 ```
 
 ## 说明
 
 - 娱乐法庭，不具法律效力，不构成法律意见
 - 判决只回应你提交的案件类别、争议焦点和所选审判官风格
-- 所有数据保存在浏览器 localStorage，删除即消失
+- 所有数据保存在本机小工具缓存，删除即消失；不上传、不联网、不读取任何账号
+- 浏览器里跑通不等于验收通过：还需创服平台模拟器 + Android / iOS 真机扫码验证同一份 zip
