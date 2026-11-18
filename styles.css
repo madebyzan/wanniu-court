@@ -229,6 +229,7 @@ ul, ol { padding: 0; list-style: none; }
   align-items: center;
   gap: 8px;
   padding: 14px var(--gutter) 0;
+  margin-bottom: 12px;
   font-size: 11.5px;
   letter-spacing: .12em;
   color: var(--muted);
@@ -319,10 +320,12 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 }
 
 /* ornamental divider ------------------------------------------------------ */
+/* a divider owns its own air: 22 above, 18 below, so it never touches the
+   block before it (the daily card was sitting 1px on top of it) */
 .ornament {
   display: grid;
   place-items: center;
-  padding: 6px 0;
+  margin: 22px 0 18px;
 }
 .ornament img { width: 190px; height: 62px; object-fit: contain; opacity: .85; }
 
@@ -331,21 +334,26 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 62px;
-  margin: 6px 0 10px;
+  width: 252px;
+  max-width: 100%;
+  aspect-ratio: 2172 / 724;
+  margin: 12px auto 4px;
 }
 .ribbon img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  /* the source is 2172x724 and the box carries that exact ratio, so contain
+     fills it edge to edge with nothing to distort */
   object-fit: contain;
   opacity: .95;
 }
 .ribbon span {
   position: relative;
-  font: 600 17px/1 var(--f-display);
+  font: 600 16px/1 var(--f-display);
   letter-spacing: .2em;
+  text-indent: .2em;
   color: #6d231c;
   text-shadow: 0 1px 0 rgba(255, 246, 226, .7);
 }
@@ -447,6 +455,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 0;
 }
 .chip {
   display: inline-flex;
@@ -492,19 +501,23 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   display: block;
   position: relative;
   overflow: clip;
-  background: #dcc9a6;
+  background: linear-gradient(160deg, #f4e8d1 0%, #ebdcbc 100%);
   border-radius: var(--r-m);
   box-shadow: inset 0 0 0 1px rgba(90, 63, 44, .35), 0 2px 8px -4px rgba(36, 24, 17, .4);
 }
 .art img { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; }
-.art::after {
+/* The dark scrim exists only so white text stays legible on artwork. Applied
+   by default it greyed out every transparent cutout - 37% of a defendant PNG
+   is transparent, so what showed through was scrim multiplied by matte. */
+.art--scrim::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(36, 24, 17, .06), rgba(36, 24, 17, .28));
+  background: linear-gradient(180deg, rgba(36, 24, 17, .05), rgba(36, 24, 17, .3));
   pointer-events: none;
 }
 .art--cut img { object-fit: contain; padding: 6%; }
+.art--cut { background: linear-gradient(160deg, #f6ecd8, #eddfc0); }
 .art--paper { background: linear-gradient(160deg, #f0e2c6, #e2cfa9); }
 
 /* custom-defendant monogram: no portrait exists, so we show the name's first
@@ -541,7 +554,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   transform: rotate(-9deg);
   opacity: .82;
 }
-.doc-comment .stamp { width: 66px; height: 66px; font-size: 10px; }
+.doc-comment .stamp { width: 66px; height: 66px; font-size: 8.5px; letter-spacing: .02em; padding-inline: 6px; }
 .stamp b { display: block; font-size: 20px; letter-spacing: .1em; }
 .wax { width: 62px; height: 62px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(80, 20, 14, .35)); }
 
@@ -711,7 +724,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 }
 .daily-inner { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; }
 .daily .art { justify-self: start; }
-.daily .art { aspect-ratio: 3 / 4; }
+.daily .art { width: 96px; aspect-ratio: 3 / 4; align-self: start; justify-self: start; }
 .daily-tag {
   display: inline-flex;
   align-items: center;
@@ -736,6 +749,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .daily-cta { margin-left: auto; }
 
 .sec { margin: 22px var(--gutter) 0; }
+.sec--tight { margin-top: 12px; }
 .sec-hd { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
 .sec-hd h2 { font-size: 20px; }
 .sec-hd .sub { margin-left: auto; font-size: 11px; color: var(--faint); letter-spacing: .08em; }
@@ -817,7 +831,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   grid-template-columns: 1fr auto 1fr auto 1fr;
   align-items: center;
   gap: 6px;
-  margin: 14px var(--gutter) 4px;
+  margin: 0 var(--gutter);
 }
 .stepper .st { display: grid; grid-template-columns: 24px 1fr; align-items: center; gap: 7px; }
 .stepper .st b {
@@ -842,7 +856,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   grid-template-columns: 22px 1fr auto;
   align-items: center;
   gap: 8px;
-  margin: 14px var(--gutter) 0;
+  margin: 12px var(--gutter) 0;
   padding: 0 12px;
   height: 46px;
   border-radius: 10px;
@@ -872,7 +886,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .searchbar .clear .ic { width: 12px; height: 12px; }
 .searchbar > span[aria-hidden] { width: 22px; }
 
-.def-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px var(--gutter) 0; }
+.def-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px var(--gutter) 0; }
 .def-card {
   position: relative;
   display: grid;
@@ -891,25 +905,28 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .def-card span { display: block; font-size: 10.5px; line-height: 1.5; color: var(--muted); }
 .def-card .tick {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 15px;
+  right: 15px;
   z-index: 2;
   width: 22px;
   height: 22px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(36, 24, 17, .35);
-  color: transparent;
-  box-shadow: inset 0 0 0 1px rgba(255, 246, 226, .5);
-  backdrop-filter: blur(1px);
+  background: rgba(250, 240, 220, .9);
+  color: #b09a76;
+  box-shadow: inset 0 0 0 1px rgba(150, 118, 68, .45);
 }
+.def-card .tick::before { content: "+"; font: 400 14px/1 var(--f-latin); }
+.def-card .tick .ic { display: none; }
 .def-card .tick .ic { width: 13px; height: 13px; }
 .def-card.is-on {
   box-shadow: inset 0 0 0 2px var(--red), 0 6px 16px -8px rgba(111, 29, 24, .5);
   background: linear-gradient(168deg, #fbf3e0, #f6ead2);
 }
-.def-card.is-on .tick { background: linear-gradient(178deg, var(--red-2), var(--red-deep)); color: #fbeed3; }
+.def-card.is-on .tick { background: linear-gradient(178deg, var(--red-2), var(--red-deep)); color: #fbeed3; box-shadow: inset 0 0 0 1px rgba(255, 236, 205, .45); }
+.def-card.is-on .tick::before { content: ""; }
+.def-card.is-on .tick .ic { display: block; }
 .def-card .flag {
   position: absolute;
   left: 9px;
@@ -925,7 +942,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 
 .pickbar {
   position: sticky;
-  bottom: calc(var(--tab-h) + env(safe-area-inset-bottom));
+  bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 10px);
   z-index: 30;
   margin: 16px var(--gutter) 0;
   padding: 10px 12px;
@@ -946,7 +963,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .pickbar .btn { margin-left: auto; min-height: 40px; padding: 8px 16px; font-size: 13px; }
 
 .custom {
-  margin: 14px var(--gutter) 0;
+  margin: 12px var(--gutter) 0;
   padding: 12px 14px;
   border-radius: var(--r-l);
   background: rgba(255, 250, 238, .5);
@@ -964,9 +981,20 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .custom-toggle .ic { width: 18px; height: 18px; color: var(--red); }
 .custom-toggle b { font-weight: 600; }
 .custom-toggle small { display: block; font-size: 10.5px; color: var(--faint); margin-top: 2px; }
-.custom-toggle .exp { margin-left: auto; color: var(--faint); transition: transform .2s ease; }
+.custom-toggle .lead { color: var(--red); flex: none; }
+.custom-toggle .txt { min-width: 0; }
+.custom-toggle .exp { margin-left: auto; flex: none; color: var(--faint); transition: transform .2s ease; }
 .custom.is-open .custom-toggle .exp { transform: rotate(45deg); }
-.custom-body { display: grid; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-2); }
+
+.custom-body {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-2);
+  /* keep the field clear of the floating action bar when focus scrolls it in */
+  scroll-margin-bottom: calc(var(--tab-h) + 76px);
+}
 .field {
   display: grid;
   gap: 6px;
@@ -987,7 +1015,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .field .counter { font-size: 10.5px; color: var(--faint); text-align: right; font-family: var(--f-latin); letter-spacing: .08em; }
 
 /* charges / evidence ------------------------------------------------------ */
-.charge-grid { display: grid; gap: 9px; margin: 14px var(--gutter) 0; }
+.charge-grid { display: grid; gap: 9px; margin: 12px var(--gutter) 0; }
 .charge {
   display: grid;
   grid-template-columns: 22px 1fr;
@@ -1366,7 +1394,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .tabs {
   display: flex;
   gap: 6px;
-  margin: 14px var(--gutter) 0 12px;
+  margin: 12px var(--gutter) 0;
   padding: 4px;
   border-radius: 999px;
   background: rgba(210, 190, 156, .35);
@@ -1430,13 +1458,13 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   transition: all .16s ease;
 }
 .rec-del:active { color: #8d2b22; background: rgba(141, 43, 34, .12); }
-.rec-list { display: grid; gap: 10px; margin: 0 var(--gutter); }
+.rec-list { display: grid; gap: 10px; margin: 12px var(--gutter) 0; }
 
 /* ---------- 10. Gallery -------------------------------------------------- */
-.g-intro { display: grid; grid-template-columns: 1fr 78px; gap: 12px; align-items: center; margin: 14px var(--gutter) 0; }
+.g-intro { display: grid; grid-template-columns: 1fr 78px; gap: 12px; align-items: center; margin: 12px var(--gutter) 0; }
 .g-intro img { width: 78px; height: 78px; object-fit: contain; }
-.g-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 var(--gutter); }
-.g-grid--wide { grid-template-columns: 1fr; }
+.g-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px var(--gutter) 0; }
+.g-grid--wide { grid-template-columns: 1fr; gap: 12px; }
 .g-card {
   display: grid;
   gap: 9px;
@@ -1458,7 +1486,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .g-open:active { transform: scale(.98); }
 .g-card .chip { align-self: start; justify-self: start; margin-top: 2px; }
 .g-card .chip .ic { width: 13px; height: 13px; }
-.g-hall { margin: 14px var(--gutter) 0; }
+.g-hall { margin: 16px var(--gutter) 0; }
 .g-hall .art { aspect-ratio: 16 / 7; }
 .g-hall .art img { object-position: center 45%; }
 

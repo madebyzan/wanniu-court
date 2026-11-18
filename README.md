@@ -44,8 +44,10 @@ npm test         # 22 项产品与视觉契约测试
 需要跑端到端校验和截图复核时，见 [tools/README.md](tools/README.md)：
 
 ```bash
-node tools/verify.mjs   # 51 项端到端断言
+node tools/verify.mjs   # 54 项端到端断言
 node tools/custom.mjs   # 抽查自定义被告的归类与判决是否名副其实
+node tools/gaps.mjs     # 逐屏量间距，报重叠/过紧/过松/边距不齐
+node tools/detail.mjs   # 逐组件出图，人工复核细节
 node tools/tour.mjs     # 全界面截图
 ```
 

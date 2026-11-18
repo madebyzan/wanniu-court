@@ -144,6 +144,23 @@ t('lang zh-CN', a11y.lang==='zh-CN');
 t('app is a live region', a11y.live==='polite');
 t('tab bar labelled', a11y.tabsAria);
 t('every img has alt attr', a11y.imgAlt===a11y.totalImg, a11y.imgAlt+'/'+a11y.totalImg);
+// floating overlays must never sit on top of the control the user is typing into
+await p.setViewportSize({ width: 390, height: 669 });
+await click('.tab-bar [data-action="trial"]');
+await click('.custom-toggle');
+await p.focus('#custom-name');
+await p.waitForTimeout(400);
+const field = await p.evaluate(() => {
+  const i = document.querySelector('#custom-name').getBoundingClientRect();
+  const pb = document.querySelector('.pickbar');
+  const tb = document.querySelector('.tab-bar').getBoundingClientRect();
+  return { inView: i.top >= 0 && i.bottom <= innerHeight, clearTab: i.bottom <= tb.top, pickbarGone: !pb };
+});
+t('focused name field is fully visible', field.inView, JSON.stringify(field));
+t('focused field clears the tab bar', field.clearTab, JSON.stringify(field));
+t('action bar yields to the open custom panel', field.pickbarGone, 'pickbar still floating');
+await p.setViewportSize({ width: 390, height: 844 });
+
 console.log('\nERRORS('+errs.length+'):', errs.slice(0,8).join('\n')||'none');
 console.log(`\n${pass} passed, ${fail} failed`);
 await b.close();

@@ -290,7 +290,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       const counts=categories.map(function(c){return c.id+':'+defendants.filter(function(d){return d.category===c.id}).length});
       return '<div class="fade-in">'+
       '<section class="hero panel">'+
-        '<div class="art hero-art">'+
+        '<div class="art art--scrim hero-art">'+
           '<span class="hero-flag"><i class="dot"></i>本庭今日开庭 · 第 '+daily.edition+' 号</span>'+
           '<img fetchpriority="high" src="'+sceneAssets.hero+'" alt="复古木刻风格的万物审判庭大厅">'+
         '</div>'+
@@ -402,8 +402,9 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
         '<div class="empty"><strong>名单里暂时没有这位被告</strong><p>换个关键词，或者把它写进诉状里。</p></div>')+
         '<div class="custom'+(state.customOpen?' is-open':'')+'">'+
           '<button class="custom-toggle" data-action="custom-toggle" aria-expanded="'+(state.customOpen?'true':'false')+'">'+
+            icon('quill','lead')+
+            '<span class="txt"><b>名单里没有？自定义一位被告</b><small>例如：永远不回消息的房东、我的周末计划</small></span>'+
             icon('plus','exp')+
-            '<span><b>名单里没有？自定义一位被告</b><small>例如：永远不回消息的房东、我的周末计划</small></span>'+
           '</button>'+
           (state.customOpen?'<div class="custom-body">'+
             '<div class="field"><label for="custom-name">被告名称</label>'+
@@ -412,11 +413,11 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
             '<button class="btn btn--solid btn--block" data-action="custom-use">确认被告并进入指控'+icon('arrow')+'</button>'+
           '</div>':'')+
         '</div>'+
-        actionbar(state.target||state.custom?
+        (state.customOpen?'':actionbar(state.target||state.custom?
           '<span class="art art--mono">'+(state.target?'<img src="'+state.target.image+'" alt="">':monogram(state.custom))+'</span>'+
           '<span class="who"><strong>'+esc(state.target?state.target.title:state.custom)+'</strong><small>'+(state.target?catName(state.target.category):'自定义被告')+'</small></span>'+
           '<button class="btn btn--solid" data-action="next">下一步'+icon('arrow')+'</button>'
-          :'<span class="art">'+('<img src="'+propAssets.magnifier+'" alt="">')+'</span><span class="who"><strong>还没有选定被告</strong><small>点一张卡片，或自定义一位</small></span>');
+          :'<span class="art">'+('<img src="'+propAssets.magnifier+'" alt="">')+'</span><span class="who"><strong>还没有选定被告</strong><small>点一张卡片，或自定义一位</small></span>'));
     }
 
     function stepCharge(){
@@ -481,7 +482,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       const who=state.target?state.target.title:state.custom;
       return '<div class="fade-in">'+crumb('退回旁听','home','Deliberation · 合议庭')+
       '<section class="delib panel">'+
-        '<div class="art delib-art"><span class="caption"><img src="'+decor.deliberation+'" alt=""><span>合议庭 · 正在评议</span></span><img src="'+sceneAssets.deliberation+'" alt="复古木刻风格的合议室"></div>'+
+        '<div class="art art--scrim delib-art"><span class="caption"><img src="'+decor.deliberation+'" alt=""><span>合议庭 · 正在评议</span></span><img src="'+sceneAssets.deliberation+'" alt="复古木刻风格的合议室"></div>'+
         '<div class="delib-body">'+
           '<div class="delib-staff"><img src="'+characterAssets.hedgehog+'" alt="刺猬执法官"><img src="'+characterAssets.frog+'" alt="青蛙书记员"><span>执法官与书记员<br>正在核对卷宗</span></div>'+
           '<span class="eyebrow">The Court Is In Session</span>'+
@@ -555,7 +556,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       '</section>'+
       '<div class="action-grid">'+
         '<button class="btn btn--solid" data-action="poster">'+icon('share')+'<span>判决海报</span></button>'+
-        '<button class="btn btn--ink" data-action="copy">'+icon('copy')+'<span>复制文案</span></button>'+
+        '<button class="btn btn--ghost" data-action="copy">'+icon('copy')+'<span>复制文案</span></button>'+
         '<button class="btn btn--ghost" data-action="appeal">'+icon('retry')+'<span>申请再审</span></button>'+
         '<button class="btn btn--ghost" data-action="archive">'+icon('archive')+'<span>我的卷宗</span></button>'+
       '</div>'+
@@ -617,7 +618,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
         '<img src="'+characterAssets.hamster+'" alt="仓鼠档案管理员"></div>'+nav+'</div>';
       if(state.galleryTab==='characters'){
         return head+'<div class="g-grid" style="margin-top:12px">'+courtCharacters.map(function(p,i){
-          return '<article class="g-card"><span class="art art--cut art--paper art--tall"><img loading="lazy" src="'+p.image+'" alt="'+esc(p.name)+'"></span>'+
+          return '<article class="g-card"><span class="art art--cut art--tall"><img loading="lazy" src="'+p.image+'" alt="'+esc(p.name)+'"></span>'+
             '<div class="meta"><small>Personnel · '+String(i+1).padStart(2,'0')+'</small><strong>'+esc(p.name)+'</strong><span>'+esc(p.role)+'</span></div></article>';
         }).join('')+'</div>'+tail();
       }
@@ -670,7 +671,11 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       syncHash();
       if(options.focusId){
         const focused=document.getElementById(options.focusId);
-        if(focused){focused.focus();if(typeof options.selectionStart==='number'&&typeof focused.setSelectionRange==='function'){try{focused.setSelectionRange(options.selectionStart,options.selectionEnd)}catch(error){}}}
+        if(focused){
+          if(focused.scrollIntoView)focused.scrollIntoView({block:'center',behavior:'auto'});
+          focused.focus();
+          if(typeof options.selectionStart==='number'&&typeof focused.setSelectionRange==='function'){try{focused.setSelectionRange(options.selectionStart,options.selectionEnd)}catch(error){}}
+        }
       }
       if(options.scroll!==false&&!options.focusId)window.scrollTo({top:0,behavior:'auto'});
     }

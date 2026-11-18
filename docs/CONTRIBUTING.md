@@ -26,7 +26,9 @@ npm test         # 22 项产品与视觉契约
 端到端与视觉复核（需要 Playwright，见 [tools/README.md](../tools/README.md)）：
 
 ```bash
-node tools/verify.mjs   # 51 项端到端断言（含「判决书 ≤ 1.8 屏」「顶栏之外不得再有深色横条」），失败即非零退出
+node tools/verify.mjs   # 54 项端到端断言（含「判决书 ≤ 1.8 屏」「顶栏之外不得再有深色横条」「聚焦控件不被浮动层压住」），失败即非零退出
+node tools/gaps.mjs     # 逐屏间距审计：OVERLAP / TIGHT / LOOSE / INSET / WIDTH
+node tools/detail.mjs   # 逐组件截图，人工复核底衬、压暗层与圆角
 node tools/tour.mjs     # 全界面整页截图
 node tools/poster.mjs   # 导出 1080x1440 海报原图
 ```
@@ -50,3 +52,5 @@ node tools/poster.mjs   # 导出 1080x1440 海报原图
 - 素材按类型只能用对应的一种用法：场景 `cover`、立绘 `contain`、证书纸九宫格 `border-image`、角花四角平铺、丝带标签等比
 - 需要新的切片数值时，先逐行扫描源图确认空白带，再按 `切片 × (盒宽 / 源宽)` 推边框宽度，不要凭感觉填像素
 - 破坏性操作用应用内确认弹层，不用 `window.confirm`
+- 垂直间距只用 4/8/12/16/22/28，且一个区块的间距只由一处负责（要么自己的 margin，要么容器的 padding）
+- 透明立绘底下是暖纸不是灰；压暗层只给真的压了白字的窗口
