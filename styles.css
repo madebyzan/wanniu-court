@@ -350,6 +350,7 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   opacity: .95;
 }
 .ribbon span {
+  margin-top: inherit;
   position: relative;
   font: 600 16px/1 var(--f-display);
   letter-spacing: .2em;
