@@ -84,23 +84,52 @@
     window.addEventListener('resize', function () { set(window.innerHeight || 0); });
   }
 
-  /* 安全区优先级：容器注入的 --safe-area-inset-* > getWindowInfo 换算 > env() > 0。
-     CSS 已经写了后两级兜底，这里只补 getWindowInfo 这一条路径。 */
-  function applySafeArea() {
+  /* 顶部避让：容器会在页面之上绘制状态栏与原生按钮胶囊（••• / ◎）。
+     在线文档 §3.11 的用途就是「页面布局与原生按钮避让」，并明确要求：
+       - safeArea 与 menuButtons 都用容器坐标系，原点是容器左上角
+       - menuButtons 始终存在，back / me / share 各为矩形，不可见时为 null
+       - 按钮隐藏时无需为其避让
+     所以这里同时算出「顶部安全区」和「被按钮占掉的右上角」，交给 CSS 变量，
+     拿不到就什么都不做，CSS 保留自己的静态兜底值。 */
+  function applyInsets() {
     atLeast(MIN.window).then(function (ok) {
       if (!ok || !has('getWindowInfo')) return null;
       return miniTool().getWindowInfo().then(function (info) {
-        var area = info && info.safeArea;
-        if (!area) return;
+        if (!info) return null;
         var root = document.documentElement;
-        var top = Number(area.top) || 0;
-        var bottom = Math.max(0, (Number(info.windowHeight) || Number(info.screenHeight) || 0) - (Number(area.bottom) || 0));
-        var left = Number(area.left) || 0;
-        var right = Math.max(0, (Number(info.windowWidth) || Number(info.screenWidth) || 0) - (Number(area.right) || 0));
-        if (top > 0) root.style.setProperty('--safe-area-inset-top', top + 'px');
-        if (bottom > 0) root.style.setProperty('--safe-area-inset-bottom', bottom + 'px');
-        if (left > 0) root.style.setProperty('--safe-area-inset-left', left + 'px');
-        if (right > 0) root.style.setProperty('--safe-area-inset-right', right + 'px');
+        var area = info.safeArea;
+        var winW = Number(info.windowWidth) || window.innerWidth || 0;
+        if (area) {
+          var top = Number(area.top) || 0;
+          var bottom = Math.max(0, (Number(info.windowHeight) || winW) - (Number(area.bottom) || 0));
+          if (top > 0) root.style.setProperty('--safe-area-inset-top', top + 'px');
+          if (bottom > 0) root.style.setProperty('--safe-area-inset-bottom', bottom + 'px');
+          if ((Number(area.left) || 0) > 0) root.style.setProperty('--safe-area-inset-left', area.left + 'px');
+          if (winW && (Number(area.right) || winW) < winW) root.style.setProperty('--safe-area-inset-right', (winW - area.right) + 'px');
+        }
+        /* 只避让真正压在顶部条带里的按钮；整条都不可见时完全不介入 */
+        var buttons = info.menuButtons || {};
+        var band = Math.max(Number(info.statusBarHeight) || 0, Number(area && area.top) || 0) + 64;
+        var leftMost = winW;
+        var lowest = 0;
+        var seen = 0;
+        ['back', 'me', 'share', 'more', 'close'].forEach(function (key) {
+          var rect = buttons[key];
+          if (!rect) return;                       /* null = 该按钮未显示 */
+          var r = Number(rect.right);
+          if (!(r > 0)) return;
+          if (Number(rect.top) >= band) return;    /* 不在顶部条带内，无需避让 */
+          seen++;
+          leftMost = Math.min(leftMost, Number(rect.left) || 0);
+          lowest = Math.max(lowest, r ? Number(rect.bottom) || 0 : 0);
+        });
+        if (!seen || !winW) return null;
+        var reserve = Math.max(0, Math.round(winW - leftMost) + 10);
+        root.style.setProperty('--menu-right', reserve + 'px');
+        root.style.setProperty('--menu-bottom', Math.max(0, Math.round(lowest)) + 'px');
+        /* 顶栏内容宽度不够时，让装饰性文案自己让位，而不是挤压标题 */
+        root.className = root.className.replace(/\s*has-menu\b/, '') + ' has-menu';
+        return reserve;
       }).catch(function () { return null });
     });
   }
@@ -228,7 +257,7 @@
     buildVersion: buildVersion,
     supportsFlexGap: supportsFlexGap,
     trackViewport: trackViewport,
-    applySafeArea: applySafeArea,
+    applyInsets: applyInsets,
     storageGet: storageGet,
     storageSet: storageSet,
     readLegacy: readLegacy,
@@ -243,5 +272,5 @@
     if (!supportsFlexGap()) document.documentElement.className += ' no-flexgap';
   } catch (error) { /* 检测失败时保留 margin 兜底：宁可间距偏大也不要贴死 */ }
   trackViewport();
-  applySafeArea();
+  applyInsets();
 })();
