@@ -125,9 +125,85 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       soft:['生活已经够难了，本庭这次选择各打五十大板。','证据只有一条，本庭决定温柔地放过它，也放过你。','和解不是免罚，是给你省一点力气。'],
       chaos:['书记员建议和解，法官看了看时间，同意了。','本案荒诞程度不足以判刑，但足以让人共情。','本庭宣布：罚双方一起去休息。']
     };
+
+    /* A custom defendant is the one thing the court actually knows nothing
+       about, so instead of a generic filler it classifies the name the user
+       typed and writes the paperwork from that. Deterministic: the same name
+       always produces the same charges, focus and evidence. */
+    const customRules=[
+      {id:'work',focus:'本庭需要确认：这件事是否属于当事人分内义务之外的额外消耗。',
+       evidence:['该情形发生在当事人已经尽到本分之后，属于额外消耗。','当事人曾多次明确表达边界，情况仍未改变。','相关影响集中在精力与时间上，且反复出现。'],
+       charges:[
+         {c:'非法占用个人时间罪',k:['会议','开会','临时','加班','通勤','上班','打卡','值班']},
+         {c:'侵犯下班安宁罪',k:['下班','晚上','夜里','周末','群消息','艾特']},
+         {c:'扩大工作范围罪',k:['需求','项目','改一下','方案','范围','甲方','版本']},
+         {c:'长期拖欠承诺罪',k:['老板','领导','画饼','涨薪','承诺','绩效']},
+         {c:'团队合作搭便车罪',k:['同事','团队','分工','协作','交接']}]},
+      {id:'life',focus:'本庭需要确认：这件日常小事是否已经稳定地干扰了当事人的生活节奏。',
+       evidence:['该情形在当事人的日常生活中反复出现，并非偶发。','当事人因此产生了可被记录的疲惫、烦躁或额外支出。','同类情形在休息时段发生频率明显更高。'],
+       charges:[
+         {c:'侵犯睡眠权罪',k:['睡','床','闹钟','半夜','凌晨','熬夜','早起','吵','噪音']},
+         {c:'诱导非必要消费罪',k:['外卖','奶茶','凑单','下单','买','快递','优惠','免配送']},
+         {c:'故意扰乱心情秩序罪',k:['天气','雨','排队','地铁','堵车','晚点','丢']},
+         {c:'扰乱生活节奏罪',k:['室友','家务','宠物','猫','狗','快递柜','物业','房东']}]},
+      {id:'social',focus:'本庭需要确认：沉默与拖延是否已经构成对当事人注意力的持续占用。',
+       evidence:['当事人多次主动沟通，得到的回应始终不明确。','等待过程本身造成了消耗，与事情大小无关。','对方清楚当事人的期待，却未作出任何安排。'],
+       charges:[
+         {c:'无故制造情绪悬念罪',k:['已读','不回','不回复','沉默','消息','聊天','玩消失']},
+         {c:'长期拖欠承诺罪',k:['下次','改天','再说','拖延','承诺','约']},
+         {c:'沟通义务怠慢罪',k:['打电话','语音','通知','告知','商量']},
+         {c:'情感冷暴力罪',k:['对象','男朋友','女朋友','恋','相亲','冷淡','敷衍']}]},
+      {id:'digital',focus:'本庭需要确认：被消耗的时间与金钱，是否出自当事人真实、清醒的意愿。',
+       evidence:['当事人在开始前设定的使用边界，实际未能生效。','停止入口不够明显，继续使用的默认状态被优先设计。','扣费或时长发生在当事人未主动发起的情况下。'],
+       charges:[
+         {c:'自动续费静默扣款罪',k:['续费','订阅','会员','扣款','自动扣','试用']},
+         {c:'非法占用个人时间罪',k:['短视频','剧','游戏','直播','刷','下滑','下一集','抖音']},
+         {c:'信息流过度投喂罪',k:['推荐','算法','推送','热搜','信息流']},
+         {c:'诱导非必要消费罪',k:['弹窗','广告','优惠券','秒杀','拼单']}]},
+      {id:'self',focus:'本庭需要确认：当事人受到的消耗，是否主要来自与被告的反复拉扯。',
+       evidence:['相关计划已多次启动并多次中断。','当事人已产生自责情绪，但实际进度没有同步变化。','每次中断都发生在接近执行的时间点。'],
+       charges:[
+         {c:'屡次逃避截止日期罪',k:['拖延','拖','截止','ddl','明天开始','改天']},
+         {c:'计划书空转罪',k:['计划','目标','清单','安排','规划']},
+         {c:'持续性精神损耗罪',k:['想太多','内耗','纠结','焦虑','脑补']},
+         {c:'自我承诺违约罪',k:['减肥','健身','跑步','学习','背书','单词','自律','早起']}]},
+      {id:'campus',focus:'本庭需要确认：该情形是否超出了当事人可以自行消化的合理范围。',
+       evidence:['该情形按固定周期重复发生，当事人无法回避。','分工与署名一致，实际交付却不一致。','当事人曾提出调整，未获得回应。'],
+       charges:[
+         {c:'团队合作搭便车罪',k:['小组','同学','队友','分工','作业','某位']},
+         {c:'署名与贡献不符罪',k:['署名','汇报','答辩','名字']},
+         {c:'侵犯睡眠权罪',k:['早八','第一节课','点名','查寝']},
+         {c:'清晨强制出勤罪',k:['课','老师','考试','论文','导师','学分']}]},
+    ];
+    const classifyCustom=function(name){
+      const text=String(name||'');
+      const hitCount=function(list){return list.reduce(function(n,k){return n+(text.indexOf(k)>=0?1:0)},0)};
+      let best=null,bestScore=0;
+      customRules.forEach(function(rule){
+        const score=rule.charges.reduce(function(n,item){return n+hitCount(item.k)},0);
+        if(score>bestScore){bestScore=score;best=rule}
+      });
+      if(!best){
+        return {id:'custom',matched:0,
+          charges:['故意扰乱心情秩序罪','持续性精神损耗罪','屡次失信罪','不合理占用当事人精力罪'],
+          focus:'争议焦点：这件事是否已经超出当事人的合理忍耐范围。',
+          evidence:['该情形已对当事人的情绪造成可记录的干扰。','当事人在合理期限内未能自行消化该影响。','相关行为具有重复性，而非一次性事件。']};
+      }
+      /* the headline charge follows whichever word the user actually wrote,
+         not a fixed list order */
+      const ranked=best.charges.map(function(item,i){return {c:item.c,s:hitCount(item.k),i:i}})
+        .sort(function(a,b){return b.s-a.s||a.i-b.i});
+      return {id:best.id,matched:bestScore,focus:best.focus,evidence:best.evidence,
+        charges:[ranked[0].c].concat(best.charges.filter(function(x){return x.c!==ranked[0].c}).map(function(x){return x.c}))};
+    };
+    const customProfile=function(name){
+      const p=classifyCustom(name);
+      return {category:p.id,matched:p.matched,charges:p.charges.slice(0,5),finding:p.focus,evidence:p.evidence.slice(0,3)};
+    };
     const pickOne=function(list){return list[Math.floor(Math.random()*list.length)]};
-    const evidenceFor=function(target){const specific=target&&caseEvidence[target.id]?caseEvidence[target.id]:[];return specific.concat(evidence).slice(0,6)};
-    const chargesFor=function(target){const specific=target&&caseCharges[target.id]?caseCharges[target.id]:[];return Array.from(new Set([target&&target.suggested,state.charge].filter(Boolean).concat(specific,charges))).slice(0,8)};
+    const evidenceFor=function(target){const specific=target&&caseEvidence[target.id]?caseEvidence[target.id]:(target&&target.profile?target.profile.evidence:[]);return specific.concat(evidence).slice(0,6)};
+    const chargesFor=function(target){const specific=target&&caseCharges[target.id]?caseCharges[target.id]:[];
+      if(target&&target.profile)specific.push.apply(specific,target.profile.charges);return Array.from(new Set([target&&target.suggested,state.charge].filter(Boolean).concat(specific,charges))).slice(0,8)};
     const getDailyDocket=function(){
       const now=new Date(),year=now.getFullYear(),month=String(now.getMonth()+1).padStart(2,'0'),day=String(now.getDate()).padStart(2,'0');
       const dateKey=year+'-'+month+'-'+day,dayNumber=Math.floor(Date.UTC(year,now.getMonth(),now.getDate())/86400000);
@@ -152,6 +228,11 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
    ========================================================================== */
     const sheetEl=document.getElementById('sheet');
     const icon=function(name,cls){return '<svg class="ic'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#i-'+name+'"/></svg>'};
+    function customWho(){
+      const name=(state.custom||'').trim()||'未具名被告';
+      const profile=customProfile(name);
+      return {id:null,title:name,category:profile.category,profile:profile,suggested:profile.charges[0]};
+    }
     const monogram=function(name,lg){
       const ch=(String(name||'诉').trim()[0]||'诉').replace(/[<>"'&]/g,'');
       return '<span class="mono'+(lg?' mono--lg':'')+'">'+esc(ch)+'</span>';
@@ -339,19 +420,23 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
     }
 
     function stepCharge(){
-      const who=state.target||{title:state.custom||'未具名被告',category:'custom'};
+      const who=state.target||customWho();
       const list=chargesFor(who);
       const suggested=state.target?state.target.suggested:'';
       return '<div class="screen" style="padding-bottom:4px">'+
           '<span class="eyebrow">立案 · 02 / 确定指控</span>'+
           '<h2 class="display">给它定个罪名。</h2>'+
-          '<p class="lede">本庭已根据「'+esc(who.title)+'」的过往行为拟定以下指控，选一条最贴切的。</p>'+
+          '<p class="lede">'+(state.target
+            ?'本庭已调取「'+esc(who.title)+'」的过往行为记录，拟定以下指控，选一条最贴切的。'
+            :'书记员按你的描述把「'+esc(who.title)+'」归入<b>'+esc(catName(who.category))+'</b>'+((who.profile&&who.profile.matched)?'（命中 '+who.profile.matched+' 个特征词）':'（描述较少，按一般扰乱秩序处理）')+'，并据此拟定以下指控。')+'</p>'+
         '</div>'+
         '<div class="charge-grid">'+list.map(function(c){
           const on=state.charge===c;
+          const note=!state.target&&c===suggested?'依描述命中「'+esc(who.title)+'」，本庭优先适用'
+            :(c===suggested?'本庭建议指控 · 与该被告高度相关':'经书记员检索，符合本案情节');
           return '<button class="charge'+(on?' is-on':'')+'" data-action="charge" data-id="'+esc(c)+'" aria-pressed="'+(on?'true':'false')+'">'+
             '<span class="box">'+icon('check')+'</span>'+
-            '<span><strong>'+esc(c)+'</strong><small>'+(c===suggested?'本庭建议指控 · 与该被告高度相关':'经书记员检索，符合本案情节')+'</small></span>'+
+            '<span><strong>'+esc(c)+'</strong><small>'+esc(note)+'</small></span>'+
           '</button>';
         }).join('')+'</div>'+
         '<div class="sec" style="margin-bottom:0"><div class="sec-hd"><h3 class="display" style="font-size:16px">选择审判官</h3><span class="sub">影响判罚与点评</span></div></div>'+
@@ -365,7 +450,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
     }
 
     function stepEvidence(){
-      const who=state.target||{title:state.custom||'未具名被告'};
+      const who=state.target||customWho();
       const list=evidenceFor(who);
       const full=state.evidence.length>=2;
       return '<div class="screen" style="padding-bottom:4px">'+
@@ -607,7 +692,9 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       if(state.page!=='processing')return;
       if(delibTimer){clearInterval(delibTimer);delibTimer=null}
       const style=judgeStyles.find(function(x){return x.id===state.judge})||judgeStyles[0];
-      const target=state.target,category=target?target.category:'custom';
+      const target=state.target;
+      const who=target||customWho();
+      const category=who.category;
       const evidenceCount=state.evidence.length;
       const outcome=(evidenceCount>=2||style.id==='strict')?'guilty':'settle';
       const sentence=outcome==='guilty'?pickOne(verdictSentences[category]||verdictSentences.custom):pickOne(settleSentences[style.id]||settleSentences.strict);
@@ -621,7 +708,8 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
         target:target?target.title:state.custom,defendantId:target?target.id:null,category:category,
         mark:target?target.mark:'诉',charge:state.charge,evidence:state.evidence.slice(0,2),
         outcome:outcome,
-        finding:target&&caseFindings[target.id]?caseFindings[target.id]:'争议焦点：这件事是否已经超出当事人的合理忍耐范围。',
+        finding:target&&caseFindings[target.id]?caseFindings[target.id]:(who.profile?who.profile.finding:'争议焦点：这件事是否已经超出当事人的合理忍耐范围。'),
+        customClassified:target?null:(who.profile?who.profile.matched:0),
         sentence:sentence,penalty:penalty,
         judge:style.name,
         judgeComment:comment+(evidenceCount>1?' 本案提交两项证据，依法从重考虑。':' 本庭已记录当事人的第一项证据。'),
@@ -960,7 +1048,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       else if(action==='custom-use'){
         const value=state.custom.trim();
         if(value.length<2||value.length>18){showToast('请输入 2–18 个字的被告名称');return}
-        state.target=null;state.custom=value;state.charge='故意扰乱心情秩序罪';state.evidence=[];state.caseMode='manual';state.appealOf=null;state.appealRound=0;state.step=2;state.page='trial';render();
+        state.target=null;state.custom=value;state.charge=customWho().suggested;state.evidence=[];state.caseMode='manual';state.appealOf=null;state.appealRound=0;state.step=2;state.page='trial';render();
       }
       else if(action==='next'){
         if(state.step===1&&!state.target&&!state.custom){showToast('请先选择一位被告');return}

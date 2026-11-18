@@ -18,7 +18,7 @@ npm run dev
 
 ```bash
 npm run check    # 52 张素材存在且接入界面
-npm test         # 21 项产品与视觉契约
+npm test         # 22 项产品与视觉契约
 ```
 
 提交前必须保证两条命令通过。契约测试覆盖内联脚本语法、移动端 viewport、远程资源约束、关键交互入口、本地历史边界，并且会**主动拦截**两类历史翻车：把场景/物件图 `background-size: 100% 100%` 铺成 UI 表面，以及把 `page-corners.png` 整张拉伸。

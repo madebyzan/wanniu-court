@@ -183,3 +183,15 @@ test('poster windows carry no baked caption bars and single exhibits are unnumbe
   assert.equal(appJs.includes("g.fillRect(x,y+h-38,w,38)"), false, 'hard black caption bars were removed');
   assert.ok(appJs.includes('const evText=ev.length===1?ev[0]'), 'one exhibit must not render a "1." prefix');
 });
+
+test('custom defendants are classified from the words the user typed', () => {
+  assert.ok(appJs.includes('const customRules=['), 'custom defendants need a real classifier');
+  for (const id of ['work','life','social','digital','self','campus']) {
+    assert.ok(new RegExp("\\{id:'" + id + "',focus:").test(appJs), 'no rule for category ' + id);
+  }
+  assert.ok(appJs.includes('const ranked=best.charges.map'), 'headline charge must follow the matched keyword, not list order');
+  assert.ok(appJs.includes('依描述命中'), 'the court must show which reading produced the charge');
+  assert.ok(appJs.includes("id:'custom',matched:0"), 'unmatched names must fall back honestly, not pretend to be classified');
+  assert.equal(appJs.includes("state.charge='故意扰乱心情秩序罪'"), false, 'custom defendants must not get a hardcoded charge');
+  assert.ok(appJs.includes('customClassified:'), 'the archived record must keep how it was classified');
+});
