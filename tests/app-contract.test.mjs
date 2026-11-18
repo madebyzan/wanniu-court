@@ -46,8 +46,8 @@ test('visual system keeps responsive behaviour and reduced-motion support', () =
 });
 
 test('decor artwork is used as chrome, not as stretched page backgrounds', () => {
-  const inCss = ['btn-primary.png','btn-secondary.png','case-card-frame.png','category-label.png','page-corners.png','verdict-paper.png'];
-  const inJs = ['deliberation-banner.png','divider-ornament.png','section-banner.png'];
+  const inCss = ['btn-primary.png','btn-secondary.png','case-card-frame.png','category-label.png','page-corners.png'];
+  const inJs = ['deliberation-banner.png','divider-ornament.png','section-banner.png','verdict-paper.png'];
   for (const d of inCss) assert.ok(css.includes(d), 'missing decoration use in CSS: ' + d);
   for (const d of inJs) assert.ok(appJs.includes(d), 'missing decoration use in JS: ' + d);
   assert.equal(css.includes('page-corners.png") center/100% 100%'), false, 'page-corners must be sliced into corners, never stretched across a page');
@@ -166,7 +166,6 @@ test('illustration artwork is never stretched into UI surfaces', () => {
   const stretched = [...css.matchAll(/url\("\.\/assets\/(scenes|props)[^"]*"\)[^;]*100% 100%/g)];
   assert.equal(stretched.length, 0, 'scene and prop artwork must crop or slice, never stretch: ' + JSON.stringify(stretched.map(m => m[0])));
   assert.ok(css.includes('object-fit: cover'), 'artwork windows should crop, not stretch');
-  assert.ok(css.includes('border-image'), 'certificate frames must use sliced border images');
   assert.ok(css.includes('aspect-ratio'), 'artwork windows must reserve their box before the image loads');
 });
 

@@ -520,17 +520,13 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
         ?'<ol>'+v.evidence.map(function(e){return '<li>'+esc(e)+'</li>'}).join('')+'</ol>'
         :'<span class="sub">当事人陈述已记录在案。</span>';
       return '<div class="fade-in">'+
-      '<div class="verdict-bar">'+
-        '<span class="seal">宣</span>'+
-        '<span class="txt"><strong>'+(v.appealRound?'再审结束，判决如下':'审判结束，判决如下')+'</strong>'+
-        '<small>'+esc(caseType)+' · '+esc(appealLabel)+' · 卷宗已归档</small></span>'+
-        outcomeBadge(v)+
-      '</div>'+
       '<article class="doc">'+
         '<div class="doc-crest"><img src="'+sceneAssets.verdict+'" alt="万物审判庭判决书抬头"></div>'+
         '<div class="doc-body">'+
-          '<div class="doc-title"><h2>'+(outcome==='guilty'?'刑事判决书':'和解书')+'</h2>'+
-            '<small>娱乐法庭 · '+esc(appealLabel)+'</small>'+
+          '<div class="doc-title">'+
+            '<span class="kicker">'+(v.appealRound?'再审结束':'审判结束')+' · 卷宗已归档</span>'+
+            '<h2>'+(outcome==='guilty'?'刑事判决书':'和解书')+'</h2>'+
+            '<small>娱乐法庭 · '+esc(caseType)+' · '+esc(appealLabel)+'</small>'+
             '<span class="docket">案号 '+esc(v.docket)+'</span>'+
             '<span class="rule"></span></div>'+
           '<div class="doc-row"><b>被告</b><div class="v"><strong>'+esc(v.target)+'</strong>'+
@@ -786,22 +782,34 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
         lines.forEach(function(item,i){g.fillText(item,x,y+i*lineHeight)});
         return y+Math.max(1,lines.length)*lineHeight;
       };
-      const wrapMax=function(str,x,y,maxWidth,lineHeight,maxLines,font,color){
-        g.font=font;g.fillStyle=color;g.textAlign='left';g.textBaseline='alphabetic';
+      /* Chinese line-break rules (禁則処理). Canvas wraps blindly by default and
+         will happily strand a lone 。 on its own line - exactly the 压线 the user
+         flagged. Closing marks stay glued to the previous line; opening marks
+         never trail off the end of one. */
+      const NO_LINE_START='。，、；：？！）〕〉》」』】”’…—～·';
+      const NO_LINE_END='（〔〈《「『【“(';
+      const kinsoku=function(src,maxWidth){
         const lines=[];let line='';
-        for(const ch of String(str)){
+        for(const ch of String(src)){
           const cand=line+ch;
           if(line&&g.measureText(cand).width>maxWidth){
-            if(lines.length===maxLines-1){
-              let tail=line;
-              while(tail&&g.measureText(tail+'…').width>maxWidth)tail=tail.slice(0,-1);
-              lines.push(tail+'…');line='';
-              return emit(lines,x,y,lineHeight);
-            }
+            if(NO_LINE_START.indexOf(ch)>=0){line=cand;continue}
+            if(NO_LINE_END.indexOf(line[line.length-1])>=0){lines.push(line.slice(0,-1));line=line.slice(-1)+ch;continue}
             lines.push(line);line=ch;
           }else{line=cand}
         }
         if(line)lines.push(line);
+        return lines.length?lines:[''];
+      };
+      const wrapMax=function(str,x,y,maxWidth,lineHeight,maxLines,font,color){
+        g.font=font;g.fillStyle=color;g.textAlign='left';g.textBaseline='alphabetic';
+        let lines=kinsoku(str,maxWidth);
+        if(lines.length>maxLines){
+          lines=lines.slice(0,maxLines);
+          let tail=lines[maxLines-1];
+          while(tail&&g.measureText(tail+'…').width>maxWidth)tail=tail.slice(0,-1);
+          lines[maxLines-1]=tail+'…';
+        }
         return emit(lines,x,y,lineHeight);
       };
       const emit=function(lines,x,y,lineHeight){
@@ -905,7 +913,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
 
       /* 5. verdict plaque */
       const settle=outcomeOf(v)!=='guilty';
-      const plaqueY=Math.min(y,H-442),plaqueH=198;
+      const plaqueY=Math.min(y,950),plaqueH=198;
       const pg=g.createLinearGradient(0,plaqueY,0,plaqueY+plaqueH);
       pg.addColorStop(0,settle?'#5d7355':'#a8392c');pg.addColorStop(1,settle?'#3b4f36':'#6f1d18');
       round(L,plaqueY,CW,plaqueH,10);g.fillStyle=pg;g.fill();
@@ -916,7 +924,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       wrapMax((settle?'和解条件：':'附加处罚：')+v.penalty,L+44,plaqueY+152,CW-88,26,2,'20px '+SANS,'#f1d7b2');
 
       /* 6. judge comment + wax seal */
-      const footY=plaqueY+plaqueH+52;
+      const footY=plaqueY+plaqueH+54;
       text('审判官 · '+v.judge,L+26,footY,'23px '+SERIF,'#76583a');
       wrapMax(v.judgeComment,L+26,footY+40,CW-270,30,3,'21px '+SERIF,'#463627');
       try{

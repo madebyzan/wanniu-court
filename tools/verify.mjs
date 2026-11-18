@@ -64,7 +64,19 @@ t('crest band uses verdict artwork cropped, not stretched', !!(bands.crest && ba
 t('seal band uses verdict artwork cropped', !!(bands.seal && bands.seal.src.includes('verdict-paper') && bands.seal.fit === 'cover'), JSON.stringify(bands.seal));
 t('certificate bands stay proportional to width', Math.abs(bands.crest.h / bands.crest.w - 490 / 1086) < 0.02, 'crest ratio ' + (bands.crest.h / bands.crest.w).toFixed(3));
 t('verdict page fits 1.8 screens at 390px', bands.page <= 844 * 1.8, bands.page + 'px = ' + (bands.page / 844).toFixed(2) + ' screens');
-t('verdict summary bar carries outcome + docket', await p.locator('.verdict-bar').count() === 1 && (await p.locator('.verdict-bar .badge').count()) === 1);
+// the verdict screen once stacked a dark summary bar directly under the dark
+// app bar; the two read as the same component duplicated. Guard the shape.
+const topBars = await p.evaluate(() => {
+  const dark = [...document.querySelectorAll('.app-shell *')].filter(e => {
+    const cs = getComputedStyle(e), r = e.getBoundingClientRect();
+    if (r.width < 200 || r.top > 260 || r.height < 24 || r.height > 90) return false;
+    const m = cs.backgroundColor.match(/\d+/g);
+    return m && +m[0] < 70 && +m[1] < 55 && +m[2] < 45 && cs.borderRadius !== '0px';
+  });
+  return { barCount: dark.length, titles: [...document.querySelectorAll('.doc-title .kicker, .doc-title h2, .doc-title .docket')].map(e => e.textContent.trim()) };
+});
+t('only one dark bar above the fold', topBars.barCount <= 1, topBars.barCount + ' dark bars');
+t('document title block carries kicker + case type + docket', topBars.titles.length === 3 && /审判结束|再审结束/.test(topBars.titles[0]) && /案号/.test(topBars.titles[2]), JSON.stringify(topBars.titles));
 const st1=await state();
 t('history persisted', st1.hist===1, 'hist='+st1.hist);
 t('route is #/verdict', st1.hash==='#/verdict', st1.hash);

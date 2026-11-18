@@ -1169,61 +1169,6 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 @keyframes tilt { 0%, 100% { transform: rotate(-5deg) } 50% { transform: rotate(5deg) } }
 
 /* ---------- 8. Verdict --------------------------------------------------- */
-.verdict-bar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 10px;
-  width: calc(100% - 2 * var(--gutter));
-  max-width: 420px;
-  margin: 12px auto 0;
-  padding: 9px 12px;
-  border-radius: var(--r-m);
-  background: linear-gradient(178deg, rgba(46, 30, 21, .97), rgba(30, 20, 14, .97));
-  box-shadow: inset 0 0 0 1px rgba(211, 172, 97, .3), var(--shadow-s);
-  color: #ecdcc0;
-}
-.verdict-bar .seal {
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 3px;
-  font: 600 15px/1 var(--f-display);
-  color: #f6e7c8;
-  background: linear-gradient(160deg, var(--red-2), var(--red-deep));
-  box-shadow: inset 0 0 0 1px rgba(246, 231, 200, .35);
-}
-.verdict-bar .txt { min-width: 0; display: grid; gap: 2px; }
-.verdict-bar .txt strong { font: 600 14px/1.3 var(--f-display); letter-spacing: .08em; color: #f5e7c9; }
-.verdict-bar .txt small { font-size: 10px; letter-spacing: .06em; color: #b39a76; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.verdict-head .declare {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-.verdict-head .declare .seal {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 4px;
-  font: 600 19px/1 var(--f-display);
-  color: var(--red);
-  box-shadow: inset 0 0 0 1.5px var(--red), inset 0 0 0 4px rgba(153, 48, 42, .12);
-  transform: rotate(-6deg);
-}
-
-/* The verdict document uses verdict-paper.png as two proportionally-cropped
-   bands instead of a four-sided frame. The frame cost 339px of pure ornament
-   (161px top + 178px bottom) and left ~87px of blank parchment inside the top
-   band, which is why the document ran to four screens. Cropping with
-   object-fit: cover keeps the crest (source rows 0-490, tassels included) and
-   the wax-seal band (rows 1240-1448) at their exact natural scale while
-   costing only 161px + 69px, and the title is pulled up into the crest's own
-   blank parchment so no ornament is wasted. The body between the bands is CSS
-   paper sampled from the artwork at the cut lines: #face91 -> #fad296 ->
-   #f7cc8f, with the same grain, so the seam is invisible. */
 .doc {
   width: calc(100% - 2 * var(--gutter));
   max-width: 358px;
@@ -1270,11 +1215,19 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
   padding: 0 18px 10px;
   /* percentage margins resolve against the container width, so pulling the
      title into the crest's own blank parchment stays proportional at 320px */
-  margin-top: -18.4%;
+  margin-top: -21.5%;
   position: relative;
   z-index: 2;
 }
 .doc-title { text-align: center; padding: 0 0 2px; }
+.doc-title .kicker {
+  display: block;
+  margin-bottom: 6px;
+  font: 600 10.5px/1 var(--f-body);
+  letter-spacing: .22em;
+  text-indent: .22em;
+  color: #99302a;
+}
 .doc-title h2 { font: 600 24px/1.2 var(--f-display); letter-spacing: .28em; color: #2b1c13; text-indent: .28em; }
 .doc-title small { display: block; margin-top: 4px; font-size: 10px; letter-spacing: .12em; color: #7a5a34; }
 .doc-title .docket {
