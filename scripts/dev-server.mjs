@@ -14,7 +14,7 @@ const mimeTypes = new Map([
   ['.svg', 'image/svg+xml'],
   ['.jpg', 'image/jpeg'],
   ['.jpeg', 'image/jpeg'],
-  ['.png', 'image/png'],
+  ['.webp', 'image/png'],
   ['.webp', 'image/webp'],
   ['.ico', 'image/x-icon']
 ]);

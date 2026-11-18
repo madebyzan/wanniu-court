@@ -11,8 +11,8 @@ async function reveal() {
   await page.evaluate(async () => { const h = document.documentElement.scrollHeight; for (let y = 0; y < h; y += 380) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 40)); } window.scrollTo(0, 0); });
   await page.waitForTimeout(350);
 }
-async function full(n) { await page.waitForTimeout(500); await reveal(); await page.screenshot({ path: `${out}/${n}.png`, fullPage: true }); console.log('  full', n, await page.evaluate(() => document.documentElement.scrollHeight)); }
-async function vp(n) { await page.waitForTimeout(350); await page.screenshot({ path: `${out}/${n}.png` }); console.log('  vp  ', n); }
+async function full(n) { await page.waitForTimeout(500); await reveal(); await page.screenshot({ path: `${out}/${n}.webp`, fullPage: true }); console.log('  full', n, await page.evaluate(() => document.documentElement.scrollHeight)); }
+async function vp(n) { await page.waitForTimeout(350); await page.screenshot({ path: `${out}/${n}.webp` }); console.log('  vp  ', n); }
 
 await page.goto('http://127.0.0.1:4173', { waitUntil: 'networkidle' });
 await vp('home-vp');

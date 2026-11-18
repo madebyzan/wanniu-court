@@ -7,9 +7,9 @@ from PIL import Image
 import os, sys
 
 TARGETS = [
-    "assets/decor/btn-primary.png",
-    "assets/props/laurel-wreath.png",
-    "assets/props/royal-key.png",
+    "assets/decor/btn-primary.webp",
+    "assets/props/laurel-wreath.webp",
+    "assets/props/royal-key.webp",
 ]
 
 def key_colour(px):

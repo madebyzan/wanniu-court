@@ -6,20 +6,20 @@ const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const appJs = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const artwork = [
-  "assets/scenes/hero-court.png","assets/scenes/case-hall.png","assets/scenes/filing-hall.png",
-  "assets/scenes/deliberation-room.png","assets/scenes/archive-room.png","assets/scenes/verdict-paper.png",
-  "assets/characters/cat-lawyer.png","assets/characters/frog-clerk.png","assets/characters/hamster-archivist.png",
-  "assets/characters/hedgehog-bailiff.png","assets/characters/judge-pigeon.png","assets/characters/rabbit-witness.png",
-  "assets/defendants/alarm.png","assets/defendants/algorithm.png","assets/defendants/autoplay.png","assets/defendants/boss.png",
-  "assets/defendants/delivery.png","assets/defendants/early.png","assets/defendants/group.png","assets/defendants/meeting.png",
-  "assets/defendants/monday.png","assets/defendants/next.png","assets/defendants/overthink.png","assets/defendants/procrastination.png",
-  "assets/defendants/rain.png","assets/defendants/read.png","assets/defendants/renew.png","assets/defendants/simple-change.png",
-  "assets/props/case-folder.png","assets/props/court-column.png","assets/props/crown.png","assets/props/evidence-envelope.png",
-  "assets/props/gavel.png","assets/props/hourglass.png","assets/props/laurel-wreath.png","assets/props/magnifier.png",
-  "assets/props/pocket-watch.png","assets/props/quill.png","assets/props/royal-candlestick.png","assets/props/royal-key.png",
-  "assets/props/royal-scroll.png","assets/props/royal-seal.png","assets/props/royal-shield.png","assets/props/scales.png",
-  "assets/decor/btn-primary.png","assets/decor/btn-secondary.png","assets/decor/case-card-frame.png","assets/decor/category-label.png",
-  "assets/decor/deliberation-banner.png","assets/decor/divider-ornament.png","assets/decor/page-corners.png","assets/decor/section-banner.png"
+  "assets/scenes/hero-court.webp","assets/scenes/case-hall.webp","assets/scenes/filing-hall.webp",
+  "assets/scenes/deliberation-room.webp","assets/scenes/archive-room.webp","assets/scenes/verdict-paper.webp",
+  "assets/characters/cat-lawyer.webp","assets/characters/frog-clerk.webp","assets/characters/hamster-archivist.webp",
+  "assets/characters/hedgehog-bailiff.webp","assets/characters/judge-pigeon.webp","assets/characters/rabbit-witness.webp",
+  "assets/defendants/alarm.webp","assets/defendants/algorithm.webp","assets/defendants/autoplay.webp","assets/defendants/boss.webp",
+  "assets/defendants/delivery.webp","assets/defendants/early.webp","assets/defendants/group.webp","assets/defendants/meeting.webp",
+  "assets/defendants/monday.webp","assets/defendants/next.webp","assets/defendants/overthink.webp","assets/defendants/procrastination.webp",
+  "assets/defendants/rain.webp","assets/defendants/read.webp","assets/defendants/renew.webp","assets/defendants/simple-change.webp",
+  "assets/props/case-folder.webp","assets/props/court-column.webp","assets/props/crown.webp","assets/props/evidence-envelope.webp",
+  "assets/props/gavel.webp","assets/props/hourglass.webp","assets/props/laurel-wreath.webp","assets/props/magnifier.webp",
+  "assets/props/pocket-watch.webp","assets/props/quill.webp","assets/props/royal-candlestick.webp","assets/props/royal-key.webp",
+  "assets/props/royal-scroll.webp","assets/props/royal-seal.webp","assets/props/royal-shield.webp","assets/props/scales.webp",
+  "assets/decor/btn-primary.webp","assets/decor/btn-secondary.webp","assets/decor/case-card-frame.webp","assets/decor/category-label.webp",
+  "assets/decor/deliberation-banner.webp","assets/decor/divider-ornament.webp","assets/decor/page-corners.webp","assets/decor/section-banner.webp"
 ];
 const defendants = ['monday','meeting','simple','boss','alarm','delivery','rain','read','next','autoplay','renew','algorithm','procrastination','overthink','early','group'];
 
@@ -46,11 +46,11 @@ test('visual system keeps responsive behaviour and reduced-motion support', () =
 });
 
 test('decor artwork is used as chrome, not as stretched page backgrounds', () => {
-  const inCss = ['btn-primary.png','btn-secondary.png','case-card-frame.png','category-label.png','page-corners.png'];
-  const inJs = ['deliberation-banner.png','divider-ornament.png','section-banner.png','verdict-paper.png'];
+  const inCss = ['btn-primary.webp','btn-secondary.webp','case-card-frame.webp','category-label.webp','page-corners.webp'];
+  const inJs = ['deliberation-banner.webp','divider-ornament.webp','section-banner.webp','verdict-paper.webp'];
   for (const d of inCss) assert.ok(css.includes(d), 'missing decoration use in CSS: ' + d);
   for (const d of inJs) assert.ok(appJs.includes(d), 'missing decoration use in JS: ' + d);
-  assert.equal(css.includes('page-corners.png") center/100% 100%'), false, 'page-corners must be sliced into corners, never stretched across a page');
+  assert.equal(css.includes('page-corners.webp") center/100% 100%'), false, 'page-corners must be sliced into corners, never stretched across a page');
   assert.ok(css.includes('background-size: 26% auto'), 'page-corners must render as four corner tiles');
 });
 
@@ -64,7 +64,7 @@ test('all 52 PNG assets exist and are referenced', async () => {
 });
 
 test('assets that must be transparent carry real alpha, not a baked white box', async () => {
-  for (const path of ['assets/decor/btn-primary.png','assets/props/laurel-wreath.png','assets/props/royal-key.png']) {
+  for (const path of ['assets/decor/btn-primary.webp','assets/props/laurel-wreath.webp','assets/props/royal-key.webp']) {
     const bytes = await readFile(new URL('../' + path, import.meta.url));
     const colorType = bytes[25];
     const chunks = bytes.toString('latin1');

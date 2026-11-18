@@ -22,7 +22,7 @@ for (const w of widths) {
       total:document.documentElement.scrollHeight, screens:+(document.documentElement.scrollHeight/innerHeight).toFixed(2)};
   });
   console.log(String(w).padStart(4), JSON.stringify(m), errs.length?('ERR '+errs[0]):'');
-  if (w===390) await p.screenshot({path:'shots/final-verdict.png', fullPage:true});
-  if (w===320) await p.screenshot({path:'shots/final-verdict-320.png', fullPage:true});
+  if (w===390) await p.screenshot({path:'shots/final-verdict.webp', fullPage:true});
+  if (w===320) await p.screenshot({path:'shots/final-verdict-320.webp', fullPage:true});
 }
 await b.close();

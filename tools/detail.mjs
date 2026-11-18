@@ -7,7 +7,7 @@ const p=await (await b.newContext({viewport:{width:390,height:844},deviceScaleFa
 const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
 const click=s=>p.click(s,{timeout:6000}).catch(()=>console.log('!!',s));
 const reveal=async()=>{await p.evaluate(async()=>{for(let y=0;y<document.body.scrollHeight;y+=300){scrollTo(0,y);await new Promise(r=>setTimeout(r,40))}scrollTo(0,0)});await p.waitForTimeout(500)};
-const el=async(sel,name)=>{const e=p.locator(sel).first();if(await e.count()===0){console.log('  missing',sel);return}await e.screenshot({path:`shots/p/${name}.png`});console.log('  ',name)};
+const el=async(sel,name)=>{const e=p.locator(sel).first();if(await e.count()===0){console.log('  missing',sel);return}await e.screenshot({path:`shots/p/${name}.webp`});console.log('  ',name)};
 await p.goto('http://127.0.0.1:4173',{waitUntil:'networkidle'});
 await p.evaluate(()=>localStorage.setItem('wanniu-court-github-v1','[]'));
 await p.reload({waitUntil:'networkidle'});

@@ -41,7 +41,7 @@ if (custom) {
 // the sheet caps the preview at 320px; widen it so the element screenshot is native
 await p.evaluate(() => { const i = document.querySelector('.sheet-figure img'); i.style.width = '386px'; i.style.maxWidth = '386px'; });
 await p.waitForTimeout(300);
-const out = `shots/poster-${custom ? 'custom' : 'stock'}.png`;
+const out = `shots/poster-${custom ? 'custom' : 'stock'}.webp`;
 await p.locator('.sheet-figure img').screenshot({ path: out });
 console.log('saved', out, '| record:', await p.evaluate(() => {
   const r = JSON.parse(localStorage.getItem('wanniu-court-github-v1'))[0];
