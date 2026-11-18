@@ -152,6 +152,10 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
    ========================================================================== */
     const sheetEl=document.getElementById('sheet');
     const icon=function(name,cls){return '<svg class="ic'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#i-'+name+'"/></svg>'};
+    const monogram=function(name,lg){
+      const ch=(String(name||'诉').trim()[0]||'诉').replace(/[<>"'&]/g,'');
+      return '<span class="mono'+(lg?' mono--lg':'')+'">'+esc(ch)+'</span>';
+    };
     const art=function(src,cls,alt,lazy){return '<span class="art'+(cls?' '+cls:'')+'"><img loading="'+(lazy===false?'eager':'lazy')+'" decoding="async" src="'+src+'" alt="'+esc(alt||'')+'"></span>'};
     const outcomeOf=function(v){return v&&v.outcome?v.outcome:'guilty'};
     const outcomeLabel=function(v){return outcomeOf(v)==='guilty'?'有罪':'责令和解'};
@@ -328,7 +332,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
           '</div>':'')+
         '</div>'+
         actionbar(state.target||state.custom?
-          '<span class="art">'+(state.target?'<img src="'+state.target.image+'" alt="">':'<img src="'+propAssets.scroll+'" alt="">')+'</span>'+
+          '<span class="art art--mono">'+(state.target?'<img src="'+state.target.image+'" alt="">':monogram(state.custom))+'</span>'+
           '<span class="who"><strong>'+esc(state.target?state.target.title:state.custom)+'</strong><small>'+(state.target?catName(state.target.category):'自定义被告')+'</small></span>'+
           '<button class="btn btn--solid" data-action="next">下一步'+icon('arrow')+'</button>'
           :'<span class="art">'+('<img src="'+propAssets.magnifier+'" alt="">')+'</span><span class="who"><strong>还没有选定被告</strong><small>点一张卡片，或自定义一位</small></span>');
@@ -355,7 +359,7 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
           return '<button class="judge'+(state.judge===j.id?' is-on':'')+'" data-action="judge" data-id="'+j.id+'" aria-pressed="'+(state.judge===j.id?'true':'false')+'">'+
             '<span class="seal">'+j.seal+'</span><strong>'+esc(j.name)+'</strong><small>'+esc(j.intro)+'</small></button>';
         }).join('')+'</div>'+
-        actionbar('<span class="art">'+art(state.target?state.target.image:propAssets.scroll,'','')+'</span>'+
+        actionbar('<span class="art art--mono">'+(state.target?'<img src="'+state.target.image+'" alt="">':monogram(state.custom))+'</span>'+
           '<span class="who"><strong>'+esc(state.charge||'尚未选择罪名')+'</strong><small>'+esc(who.title)+' · '+esc((judgeStyles.find(function(j){return j.id===state.judge})||judgeStyles[0]).name)+'</small></span>'+
           '<button class="btn btn--solid" data-action="next">下一步'+icon('arrow')+'</button>');
     }
@@ -489,9 +493,9 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
           return '<button class="'+(state.archiveTab===t.id?'is-on':'')+'" data-action="archive-tab" data-id="'+t.id+'">'+t.label+'<span class="n">'+t.n+'</span></button>';
         }).join('')+'</div>':'')+
         (list.length?'<div class="rec-list">'+list.map(function(x){
-          const portrait=x.defendantId&&defendantAssets[x.defendantId]?defendantAssets[x.defendantId]:propAssets.scroll;
+          const portrait=x.defendantId&&defendantAssets[x.defendantId]?defendantAssets[x.defendantId]:null;
           return '<article class="rec">'+
-            art(portrait,'',x.target)+
+            (portrait?art(portrait,'',x.target):'<span class="art art--mono">'+monogram(x.target)+'</span>')+
             '<button class="rec-body" data-action="open-verdict" data-id="'+esc(x.id)+'">'+
               '<span class="rec-top"><strong>'+esc(x.target||'未命名案件')+'</strong><time>'+esc(shortDate(x.date))+'</time></span>'+
               '<span class="rec-charge">'+esc(x.charge||'')+'</span>'+
@@ -732,19 +736,19 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
           img.onload=function(){
             const s=Math.max(w/img.width,h/img.height);
             g.drawImage(img,x+(w-img.width*s)/2,y+(h-img.height*s)/2,img.width*s,img.height*s);
-            g.restore();frameWindow(x,y,w,h,label);resolve();
+            g.restore();frameWindow(x,y,w,h);resolve();
           };
-          img.onerror=function(){g.fillStyle='#e2cfa9';g.fillRect(x,y,w,h);g.restore();frameWindow(x,y,w,h,label);resolve()};
+          img.onerror=function(){g.fillStyle='#e2cfa9';g.fillRect(x,y,w,h);g.restore();frameWindow(x,y,w,h);resolve()};
           img.src=src;
         });
       };
-      const frameWindow=function(x,y,w,h,label){
+      const frameWindow=function(x,y,w,h){
         const veil=g.createLinearGradient(0,y,0,y+h);
         veil.addColorStop(0,'rgba(36,24,17,.12)');veil.addColorStop(1,'rgba(36,24,17,.42)');
         g.fillStyle=veil;g.fillRect(x,y,w,h);
         g.strokeStyle='#c49a60';g.lineWidth=3;g.strokeRect(x,y,w,h);
         g.strokeStyle='rgba(246,224,184,.35)';g.lineWidth=1;g.strokeRect(x+6,y+6,w-12,h-12);
-        if(label){g.fillStyle='rgba(36,24,17,.6)';g.fillRect(x,y+h-38,w,38);text(label,x+16,y+h-13,'18px '+SANS,'#f0dcb2')}
+
       };
 
       /* 1. crest plate */
@@ -761,10 +765,30 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       g.beginPath();g.moveTo(cx-150,plateY+140);g.lineTo(cx+150,plateY+140);g.stroke();
       text(outcomeOf(v)==='guilty'?'娱乐法庭 · 刑事判决书':'娱乐法庭 · 和解书',cx,plateY+172,'25px '+SERIF,'#f0dcb2','center');
 
-      /* 2. scene + defendant windows */
+      /* 2. scene + defendant windows. A custom defendant has no portrait, and
+         filling that window with a blank scroll reads as a broken image, so we
+         draw a typographic nameplate instead. */
       const bandY=plateY+plateH+24,bandH=240,artW=Math.round(CW*0.655),gap=18;
-      await window2(L,bandY,artW,bandH,sceneAssets.hero,'主审判庭');
-      await window2(L+artW+gap,bandY,CW-artW-gap,bandH,v.defendantId?defendantAssets[v.defendantId]:propAssets.scroll,'被 告');
+      await window2(L,bandY,artW,bandH,sceneAssets.hero);
+      const pX=L+artW+gap,pW=CW-artW-gap;
+      if(v.defendantId&&defendantAssets[v.defendantId]){
+        await window2(pX,bandY,pW,bandH,defendantAssets[v.defendantId]);
+      }else{
+        const plate=g.createLinearGradient(0,bandY,0,bandY+bandH);
+        plate.addColorStop(0,'#f8ecd2');plate.addColorStop(1,'#eedbb0');
+        g.fillStyle=plate;g.fillRect(pX,bandY,pW,bandH);
+        g.strokeStyle='#b3873c';g.lineWidth=2;g.strokeRect(pX+1,bandY+1,pW-2,bandH-2);
+        g.strokeStyle='rgba(179,135,60,.4)';g.lineWidth=1;g.strokeRect(pX+9,bandY+9,pW-18,bandH-18);
+        const pcx=pX+pW/2;
+        text('被 告',pcx,bandY+62,'22px '+SERIF,'#99302a','center');
+        g.strokeStyle='rgba(153,48,42,.35)';g.lineWidth=1;
+        g.beginPath();g.moveTo(pcx-42,bandY+76);g.lineTo(pcx+42,bandY+76);g.stroke();
+        g.font=fit(v.target,pW-56,54,22);g.fillStyle='#2b1d16';g.textAlign='center';
+        g.fillText(v.target,pcx,bandY+140);
+        text('自定义被告 · 本庭照单受理',pcx,bandY+190,'17px '+SANS,'#8a6f4e','center');
+        g.fillStyle='rgba(179,135,60,.55)';
+        [[pX+16,bandY+16],[pX+pW-16,bandY+16],[pX+16,bandY+bandH-16],[pX+pW-16,bandY+bandH-16]].forEach(function(c){g.fillRect(c[0]-3,c[1]-3,6,6)});
+      }
 
       /* 3. docket */
       let y=bandY+bandH+48;
@@ -784,19 +808,20 @@ const judgePortrait = './assets/characters/judge-pigeon.png';
       row('焦 点',(v.finding||'').replace(/^争议焦点[：:]/,''),'24px '+SERIF);
       text('证 据',labelX,y,'22px '+SANS,'#98764f');
       const ev=(v.evidence&&v.evidence.length)?v.evidence:['当事人陈述已记录在案。'];
-      y=wrapMax(ev.map(function(e,i){return (i+1)+'. '+e}).join('   '),valueX,y,valueW,32,3,'21px '+SANS,'#514236')+30;
+      const evText=ev.length===1?ev[0]:ev.map(function(e,i){return (i+1)+'. '+e}).join('   ');
+      y=wrapMax(evText,valueX,y,valueW,32,3,'21px '+SANS,'#514236')+30;
 
       /* 5. verdict plaque */
       const settle=outcomeOf(v)!=='guilty';
-      const plaqueY=Math.min(y,H-430),plaqueH=186;
+      const plaqueY=Math.min(y,H-442),plaqueH=198;
       const pg=g.createLinearGradient(0,plaqueY,0,plaqueY+plaqueH);
       pg.addColorStop(0,settle?'#5d7355':'#a8392c');pg.addColorStop(1,settle?'#3b4f36':'#6f1d18');
       round(L,plaqueY,CW,plaqueH,10);g.fillStyle=pg;g.fill();
       g.strokeStyle='rgba(246,224,184,.5)';g.lineWidth=2;round(L+9,plaqueY+9,CW-18,plaqueH-18,7);g.stroke();
       text(settle?'和 解 条 件':'本 庭 判 决 如 下',cx,plaqueY+44,'22px '+SERIF,'#f8e9d2','center');
       g.font=fit(v.sentence,CW-90,44,26);g.fillStyle='#fff0d9';g.textAlign='center';
-      g.fillText(v.sentence,cx,plaqueY+102);
-      wrapMax((settle?'和解条件：':'附加处罚：')+v.penalty,L+40,plaqueY+146,CW-80,26,2,'20px '+SANS,'#f1d7b2');
+      g.fillText(v.sentence,cx,plaqueY+104);
+      wrapMax((settle?'和解条件：':'附加处罚：')+v.penalty,L+44,plaqueY+152,CW-88,26,2,'20px '+SANS,'#f1d7b2');
 
       /* 6. judge comment + wax seal */
       const footY=plaqueY+plaqueH+52;

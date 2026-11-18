@@ -169,3 +169,17 @@ test('illustration artwork is never stretched into UI surfaces', () => {
   assert.ok(css.includes('border-image'), 'certificate frames must use sliced border images');
   assert.ok(css.includes('aspect-ratio'), 'artwork windows must reserve their box before the image loads');
 });
+
+test('custom defendants fall back to a drawn monogram, never to decorative artwork', () => {
+  assert.ok(appJs.includes('const monogram=function('), 'custom defendants need a typographic placeholder');
+  assert.ok(appJs.includes('art--mono'), 'the artwork scrim must not grey out the monogram plate');
+  assert.equal(/defendantId\?defendantAssets\[[^\]]*\]:propAssets\.scroll/.test(appJs), false,
+    'a blank scroll in the defendant slot reads as a broken image');
+  assert.equal(appJs.includes("'被 告'") && appJs.includes("自定义被告 · 本庭照单受理"), true,
+    'the poster must draw a nameplate for custom defendants');
+});
+
+test('poster windows carry no baked caption bars and single exhibits are unnumbered', () => {
+  assert.equal(appJs.includes("g.fillRect(x,y+h-38,w,38)"), false, 'hard black caption bars were removed');
+  assert.ok(appJs.includes('const evText=ev.length===1?ev[0]'), 'one exhibit must not render a "1." prefix');
+});

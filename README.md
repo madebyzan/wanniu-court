@@ -37,7 +37,7 @@ Node.js 20+，产品运行时零第三方依赖。
 ```bash
 npm run dev      # http://127.0.0.1:4173
 npm run check    # 校验 52 张素材存在且已接入界面
-npm test         # 19 项产品与视觉契约测试
+npm test         # 21 项产品与视觉契约测试
 ```
 
 需要跑端到端校验和截图复核时，见 [tools/README.md](tools/README.md)：

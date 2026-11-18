@@ -507,6 +507,22 @@ h3.display { font-size: 17px; margin: 4px 0 4px; }
 .art--cut img { object-fit: contain; padding: 6%; }
 .art--paper { background: linear-gradient(160deg, #f0e2c6, #e2cfa9); }
 
+/* custom-defendant monogram: no portrait exists, so we show the name's first
+   character on a parchment plate instead of an unrelated decorative asset. */
+.mono {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font: 600 20px/1 var(--f-display);
+  color: #7c221b;
+  background: linear-gradient(160deg, #f7e9cd, #ecd9b2);
+  box-shadow: inset 0 0 0 1px rgba(179, 135, 60, .75), inset 0 0 0 4px rgba(255, 250, 236, .5);
+}
+.mono--lg { font-size: 26px; }
+/* the artwork scrim would grey out a flat plate, so monograms skip it */
+.art--mono::after { display: none; }
+
 /* seal -------------------------------------------------------------------- */
 .stamp {
   display: grid;

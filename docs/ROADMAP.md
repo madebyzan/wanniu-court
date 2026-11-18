@@ -19,7 +19,7 @@
 - [x] 搜索焦点与光标保持、清空按钮、选择不跳顶、证据上限显式禁用并解释
 - [x] 对比度、`aria-pressed`、`aria-current`、`:focus-visible`、`prefers-reduced-motion` 全量补齐
 - [x] 内联 SVG favicon，避免 404
-- [x] 契约测试从 12 项扩到 19 项，并新增 46 项端到端断言（`tools/verify.mjs`）
+- [x] 契约测试从 12 项扩到 21 项，并新增 46 项端到端断言（`tools/verify.mjs`）
 
 ## 下一轮验收
 
